@@ -1,0 +1,38 @@
+function MobileAuthorityBlocked({ onBack, onStartDesktop, darkMode, setDarkMode }) {
+  return (
+    <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
+      <MobileGateHeader title="Authority login" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div style={{ padding: "24px 18px 90px" }}>
+        <div style={{ background: COLOR.amberTint, border: `1px solid ${COLOR.amber}33`, borderRadius: 14, padding: 20, marginBottom: 20 }}>
+          <div style={{ fontSize: 30, marginBottom: 10 }}>💻</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: COLOR.text, marginBottom: 6 }}>Sorry, you need a laptop or PC for authority access</div>
+          <div style={{ fontSize: 13, color: COLOR.textSecondary, lineHeight: 1.6 }}>The Call Console, Authority, Expert, Surveillance and Admin workspaces are built for larger screens. You can still use them from this phone by switching to desktop mode below.</div>
+        </div>
+        <PrimaryBtn onClick={onStartDesktop}><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Monitor size={16} /> Start desktop mode</span></PrimaryBtn>
+        <div style={{ textAlign: "center", marginTop: 14 }}>
+          <button type="button" onClick={onBack} style={{ background: "none", border: "none", color: COLOR.textSecondary, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>← Go back</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [authed, setAuthed] = useState(false);
+  const [loggedInRole, setLoggedInRole] = useState(null);
+  // Public dashboard is the default landing view for everyone, mobile and desktop alike — no login prompt up front.
+  const [publicMode, setPublicMode] = useState(true);
+  const [activeRole, setActiveRole] = useState("authority");
+  const [toast, setToast] = useState("");
+  const [a11y, setA11y] = useState({ textLarge: false, highContrast: false, reducedMotion: false });
+  const [darkMode, setDarkMode] = useState(false);
+  const [forceDesktop, setForceDesktop] = useState(false);
+  const isMobileDevice = useIsMobile();
+  // Sub-stage of the lightweight mobile sign-in gate: null | "choice" | "farmerLogin" | "authorityBlocked"
+  const [mobileGate, setMobileGate] = useState(null);
+
+  const [cases, setCases] = useState(INITIAL_CASES);
+  const [alerts, setAlerts] = useState(INITIAL_ALERTS);
+  const [advisories, setAdvisories] = useState(ADVISORIES_INIT);
+
+  const showToast = (m) => { setToast(m); setTimeout(() =
