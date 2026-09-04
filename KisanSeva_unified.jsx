@@ -3346,6 +3346,7 @@ function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode 
 }
 
 function MobileAuthorityBlocked({ onBack, onStartDesktop, darkMode, setDarkMode }) {
+  const [showDesktopAlert, setShowDesktopAlert] = useState(false);
   return (
     <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
       <MobileGateHeader title="Authority login" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
@@ -3355,11 +3356,23 @@ function MobileAuthorityBlocked({ onBack, onStartDesktop, darkMode, setDarkMode 
           <div style={{ fontSize: 15, fontWeight: 700, color: COLOR.text, marginBottom: 6 }}>Sorry, you need a laptop or PC for authority access</div>
           <div style={{ fontSize: 13, color: COLOR.textSecondary, lineHeight: 1.6 }}>The Call Console, Authority, Expert, Surveillance and Admin workspaces are built for larger screens. You can still use them from this phone by switching to desktop mode below.</div>
         </div>
-        <PrimaryBtn onClick={onStartDesktop}><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Monitor size={16} /> Start desktop mode</span></PrimaryBtn>
+        <PrimaryBtn onClick={() => setShowDesktopAlert(true)}><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Monitor size={16} /> Start desktop mode</span></PrimaryBtn>
         <div style={{ textAlign: "center", marginTop: 14 }}>
           <button type="button" onClick={onBack} style={{ background: "none", border: "none", color: COLOR.textSecondary, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>← Go back</button>
         </div>
       </div>
+      {showDesktopAlert && (
+        <Modal title="Switch to Desktop Mode" onClose={() => setShowDesktopAlert(false)}>
+          <div style={{ fontSize: 13, color: COLOR.text, lineHeight: 1.6 }}>
+            <div style={{ marginBottom: 12 }}>To view the authority dashboards on your phone, you must manually enable "Desktop site" in your mobile browser.</div>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>For Chrome / Android:</div>
+            <div style={{ marginBottom: 12, color: COLOR.textSecondary }}>Tap the three dots (<span style={{ fontWeight: 700 }}>⋮</span>) in the top right corner and check the box for <span style={{ fontWeight: 700 }}>"Desktop site"</span>.</div>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>For Safari / iOS:</div>
+            <div style={{ marginBottom: 16, color: COLOR.textSecondary }}>Tap the <span style={{ fontWeight: 700 }}>"aA"</span> icon in the address bar and select <span style={{ fontWeight: 700 }}>"Request Desktop Website"</span>.</div>
+            <PrimaryBtn onClick={() => { setShowDesktopAlert(false); onStartDesktop(); }}>I've done it, continue</PrimaryBtn>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
