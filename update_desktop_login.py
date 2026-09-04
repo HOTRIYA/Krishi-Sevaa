@@ -82,8 +82,8 @@ new_login_screen = """function LoginScreen({ onSignIn, onViewPublic, showToast, 
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: COLOR.surfaceSunken, padding: "12px 16px", borderRadius: 10, border: `1px solid ${COLOR.border}`, marginTop: 20 }}>
                 <span style={{ fontSize: 20 }}>👉</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.text }}>Login as Admin for full access (Login for prototype login suggestion)</div>
-                  <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 4 }}>(This highlight and access will be removed when launched at full scale)</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.text }}>Login as Admin for full access (suggested for prototype version)</div>
+                  <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 4 }}>This highlight and access will be removed when launched at full scale</div>
                 </div>
               </div>
             </>
