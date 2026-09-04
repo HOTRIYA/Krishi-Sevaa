@@ -1,0 +1,217 @@
+function FarmerBottomNav({ active, onNavigate }) {
+  const items = [{ id: "home", icon: "🏡", label: "Home" }, { id: "myReports", icon: "📑", label: "Reports" }, { id: "advisories", icon: "📡", label: "Advisories" }, { id: "nearbyHelp", icon: "🧑‍⚕️", label: "Help" }];
+  return (
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: COLOR.surface, borderTop: `1px solid ${COLOR.border}`, display: "flex", padding: "8px 6px" }}>
+      {items.map((it) => (
+        <button key={it.id} onClick={() => onNavigate(it.id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, background: "none", border: "none", cursor: "pointer", padding: "4px 0", color: active === it.id ? COLOR.forest : COLOR.textMuted }}>
+          <span style={{ fontSize: 18 }}>{it.icon}</span><span style={{ fontSize: 10.5, fontWeight: active === it.id ? 700 : 500 }}>{it.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+
+function FarmerReportFlow({ onExit, onSubmitted, connectivity }) {
+  const [step, setStep] = useState(0);
+  const [data, setData] = useState({
+    animal: null, mode: null, description: "", transcriptConfirmed: false,
+    symptoms: [], duration: null, affected: null, mortality: null, mortalityCount: "",
+    locationMethod: null, pin: "", gpsDone: false, movement: null,
+    moveFrom: "", moveTo: "", moveWhen: null,
+  });
+  const set = (patch) => setData((d) => ({ ...d, ...patch }));
+  const next = () => setStep((s) => Math.min(s + 1, FARMER_STEP_TITLES.length - 1));
+  const back = () => (step === 0 ? onExit() : setStep((s) => s - 1));
+
+  const canContinue = () => {
+    if (step === 0) return !!data.animal;
+    if (step === 1) return data.mode === "type" ? data.description.trim().length > 0 : data.transcriptConfirmed;
+    if (step === 2) return true;
+    if (step === 3) return !!data.duration;
+    if (step === 4) return !!data.affected && !!data.mortality;
+    if (step === 5) return data.gpsDone || data.pin.length >= 6;
+    if (step === 6) return data.movement !== null;
+    return true;
+  };
+
+  if (step === FARMER_STEP_TITLES.length - 1) {
+    return <FarmerReviewStep data={data} onBack={back} onEdit={(i) => setStep(i)} onSubmit={() => onSubmitted(data)} connectivity={connectivity} />;
+  }
+
+  return (
+    <div style={{ paddingBottom: 100 }}>
+      <ScreenHeader title="Report a problem" onBack={back} right={<button onClick={onExit} style={{ background: "none", border: "none", color: COLOR.textMuted, fontSize: 20, cursor: "pointer" }}>✕</button>} />
+      <ProgressDots step={step} total={FARMER_STEP_TITLES.length - 1} />
+      <div style={{ padding: "6px 18px" }}>
+        {step === 0 && <FarmerStepAnimal data={data} set={set} />}
+        {step === 1 && <FarmerStepDescribe data={data} set={set} />}
+        {step === 2 && <FarmerStepSymptoms data={data} set={set} />}
+        {step === 3 && <FarmerStepDuration data={data} set={set} />}
+        {step === 4 && <FarmerStepAffected data={data} set={set} />}
+        {step === 5 && <FarmerStepLocation data={data} set={set} />}
+        {step === 6 && <FarmerStepMovement data={data} set={set} />}
+      </div>
+      <div style={{ position: "sticky", bottom: 0, background: COLOR.bg, padding: "12px 18px 18px", borderTop: `1px solid ${COLOR.border}` }}>
+        <PrimaryBtn onClick={next} disabled={!canContinue()}>Continue</PrimaryBtn>
+      </div>
+    </div>
+  );
+}
+
+
+function FarmerSubmissionResult({ result, onDone, onViewCase }) {
+  const [calling, setCalling] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  useEffect(() => { let iv; if (calling) iv = setInterval(() => setSeconds((s) => s + 1), 1000); return () => clearInterval(iv); }, [calling]);
+
+  if (result.offline) {
+    return (
+      <div style={{ padding: "40px 18px", textAlign: "center" }}>
+        <div style={{ fontSize: 44, marginBottom: 14 }}>📥</div>
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>Saved on device</div>
+        <div style={{ fontSize: 13.5, color: COLOR.textSecondary, marginBottom: 24 }}>Will sync when internet returns. Your information hasn't been lost.</div>
+        <PrimaryBtn onClick={onDone}>Back to home</PrimaryBtn>
+      </div>
+    );
+  }
+  if (calling) {
+    return (
+      <div style={{ padding: "50px 18px", textAlign: "center" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: COLOR.greenTint, color: COLOR.green, fontWeight: 700, fontSize: 13, padding: "6px 14px", borderRadius: 20, marginBottom: 20 }}>● Call in progress</div>
+        <div style={{ fontSize: 26, fontWeight: 700, fontVariantNumeric: "tabular-nums", marginBottom: 28 }}>{String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}</div>
+        <div style={{ fontSize: 14, fontWeight: 700 }}>{result.expertName}</div>
+        <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 30 }}>{result.expertArea}</div>
+        <GhostBtn full={false} onClick={() => setCalling(false)}>End call</GhostBtn>
+      </div>
+    );
+  }
+  return (
+    <div style={{ padding: "36px 18px", textAlign: "center" }}>
+      <div style={{ fontSize: 44, marginBottom: 10 }}>✅</div>
+      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Report received</div>
+      <div style={{ fontSize: 13.5, color: COLOR.textSecondary, marginBottom: 18 }}>Your case has been created successfully.</div>
+      <div style={{ background: COLOR.surfaceSunken, borderRadius: 12, padding: "10px 16px", display: "inline-block", fontSize: 14, fontWeight: 700, marginBottom: 26 }}>Case ID: {result.caseId}</div>
+      {result.available ? (
+        <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 18, textAlign: "left" }}>
+          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 10 }}>An appropriate veterinary expert is available.</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <span style={{ fontSize: 26 }}>🧑‍⚕️</span>
+            <div><div style={{ fontSize: 14, fontWeight: 700 }}>{result.expertName}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{result.expertArea} · <span style={{ color: COLOR.green, fontWeight: 600 }}>Available</span></div></div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}><PrimaryBtn onClick={() => setCalling(true)}>📲 Connect now</PrimaryBtn><GhostBtn onClick={onViewCase}>View case</GhostBtn></div>
+        </div>
+      ) : (
+        <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 18, textAlign: "left" }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4 }}>No expert is currently available</div>
+          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>You don't need to repeat your report, it's already saved to your case.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}><PrimaryBtn onClick={onDone}>Request callback</PrimaryBtn><GhostBtn onClick={onViewCase}>View case</GhostBtn></div>
+        </div>
+      )}
+      <div style={{ marginTop: 20 }}><button onClick={onDone} style={{ background: "none", border: "none", color: COLOR.textMuted, fontSize: 12.5, cursor: "pointer" }}>Back to home</button></div>
+    </div>
+  );
+}
+
+
+function FarmerMyReports({ myCases, drafts, onBack, onOpenCase }) {
+  return (
+    <div style={{ paddingBottom: 90 }}>
+      <ScreenHeader title="My reports" onBack={onBack} />
+      <div style={{ padding: "6px 18px" }}>
+        {drafts.length > 0 && (
+          <>
+            <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, margin: "10px 0 8px" }}>SAVED, WAITING TO SYNC</div>
+            {drafts.map((d, i) => (
+              <div key={i} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 12, padding: 14, marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div><div style={{ fontSize: 13.5, fontWeight: 700 }}>{d.animalLabel}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{d.symptomLabels || "Health problem reported"}</div></div>
+                <Badge fg={COLOR.amber} bg={COLOR.amberTint}>Waiting for connection</Badge>
+              </div>
+            ))}
+          </>
+        )}
+        <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, margin: "14px 0 8px" }}>SUBMITTED</div>
+        {myCases.length === 0 ? <div style={{ textAlign: "center", color: COLOR.textSecondary, fontSize: 13, padding: "30px 0" }}>No reports yet.</div> : myCases.map((r) => (
+          <button key={r.id} onClick={() => onOpenCase(r)} style={{ width: "100%", textAlign: "left", border: `1px solid ${COLOR.border}`, background: COLOR.surface, borderRadius: 12, padding: 14, marginBottom: 10, cursor: "pointer" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+              <div style={{ fontSize: 12.5, color: COLOR.textMuted, fontWeight: 600 }}>#{r.id}</div>
+              <RiskBadge level={r.risk} />
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{r.animal} · {r.structured.symptoms.value}</div>
+            <div style={{ marginTop: 6 }}><StatusBadge status={r.status} /></div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+function FarmerCaseDetail({ report, onBack }) {
+  return (
+    <div style={{ paddingBottom: 90 }}>
+      <ScreenHeader title={`Case #${report.id}`} onBack={onBack} />
+      <div style={{ padding: "6px 18px" }}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}><RiskBadge level={report.risk} /><StatusBadge status={report.status} /></div>
+        <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 16, marginBottom: 18 }}>
+          <FarmerRowStatic label="Animal" value={report.animal} />
+          <FarmerRowStatic label="Reported problem" value={report.structured.symptoms.value} />
+          <FarmerRowStatic label="Expert" value={report.expert || "Being assigned"} last />
+        </div>
+        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Timeline</div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {report.history.map((step, i) => (
+            <div key={i} style={{ display: "flex", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div style={{ width: 9, height: 9, borderRadius: "50%", background: COLOR.forest, marginTop: 4 }} />
+                {i < report.history.length - 1 && <div style={{ width: 1.5, flex: 1, background: COLOR.border, minHeight: 22 }} />}
+              </div>
+              <div style={{ fontSize: 13, color: COLOR.text, paddingBottom: 16 }}>{step.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+function FarmerAdvisories({ onBack, advisories }) {
+  const [open, setOpen] = useState(null);
+  return (
+    <div style={{ paddingBottom: 90 }}>
+      <ScreenHeader title="Advisories" onBack={onBack} />
+      <div style={{ padding: "6px 18px" }}>
+        {advisories.Sent.map((a, i) => (
+          <div key={i} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 16, marginBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{a.title}</div>
+            <div style={{ fontSize: 12, color: COLOR.textMuted, marginBottom: 10 }}>{a.area} · {a.date}</div>
+            {open === i ? <div style={{ fontSize: 13.5, color: COLOR.text, lineHeight: 1.7 }}>{a.message}</div> : <button onClick={() => setOpen(i)} style={{ background: "none", border: "none", color: COLOR.forest, fontWeight: 700, fontSize: 13, cursor: "pointer", padding: 0 }}>Read →</button>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+function FarmerNearbyHelp({ onBack }) {
+  return (
+    <div style={{ paddingBottom: 90 }}>
+      <ScreenHeader title="Nearby veterinary help" onBack={onBack} />
+      <div style={{ padding: "6px 18px" }}>
+        {NEARBY.map((n, i) => (
+          <div key={i} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 16, marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>{n.name}</div>
+              <div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{n.area} {n.available !== null && <span style={{ color: n.available ? COLOR.green : COLOR.textMuted, fontWeight: 600 }}>· {n.available ? "Available" : "Unavailable"}</span>}</div>
+            </div>
+            <GhostBtn full={false}>{n.available !== null ? "Call" : "Directions"}</GhostBtn>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
