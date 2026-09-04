@@ -1782,13 +1782,15 @@ function ExpertOverview({ cases, onOpen, onAccept }) {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12, marginBottom: 18 }}>
-        {EXPERT_KPIS.map((k) => { const t = TONE_MAP[k.tone]; return (
-          <div key={k.label} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 12, padding: 15 }}>
-            <div style={{ width: 26, height: 26, borderRadius: 7, background: t.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}><k.icon size={13} color={t.fg} /></div>
-            <div style={{ fontSize: 21, fontWeight: 700 }}>{k.value}</div><div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{k.label}</div>
-            {k.delta && <div style={{ fontSize: 11, fontWeight: 600, color: t.fg, marginTop: 4 }}>{k.delta}</div>}
-          </div>
-        ); })}
+        {EXPERT_KPIS.map((k) => {
+          const t = TONE_MAP[k.tone]; return (
+            <div key={k.label} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 12, padding: 15 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: t.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}><k.icon size={13} color={t.fg} /></div>
+              <div style={{ fontSize: 21, fontWeight: 700 }}>{k.value}</div><div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{k.label}</div>
+              {k.delta && <div style={{ fontSize: 11, fontWeight: 600, color: t.fg, marginTop: 4 }}>{k.delta}</div>}
+            </div>
+          );
+        })}
       </div>
       {clusterCase && (
         <div style={{ display: "flex", alignItems: "center", gap: 12, background: COLOR.redTint, border: `1px solid ${COLOR.red}22`, borderRadius: 12, padding: "12px 16px", marginBottom: 18 }}>
@@ -2207,15 +2209,17 @@ function SurvAlertDetail({ alert: a, onBack, onUpdate, showToast }) {
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", margin: "22px 0" }}>
-        {SURV_STEPS.map((s, i) => { const idx = survStepIndex(a); return (
-          <React.Fragment key={s}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minWidth: 0 }}>
-              <div style={{ width: 20, height: 20, borderRadius: "50%", background: i <= idx ? COLOR.forest : COLOR.surfaceSunken, color: i <= idx ? "#fff" : COLOR.textMuted, fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i < idx ? "✓" : i + 1}</div>
-              <span style={{ fontSize: 10, textAlign: "center", color: i <= idx ? COLOR.text : COLOR.textMuted, maxWidth: 76 }}>{s}</span>
-            </div>
-            {i < SURV_STEPS.length - 1 && <div style={{ flex: 1, height: 1.5, background: i < idx ? COLOR.forest : COLOR.border, marginBottom: 16 }} />}
-          </React.Fragment>
-        ); })}
+        {SURV_STEPS.map((s, i) => {
+          const idx = survStepIndex(a); return (
+            <React.Fragment key={s}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minWidth: 0 }}>
+                <div style={{ width: 20, height: 20, borderRadius: "50%", background: i <= idx ? COLOR.forest : COLOR.surfaceSunken, color: i <= idx ? "#fff" : COLOR.textMuted, fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i < idx ? "✓" : i + 1}</div>
+                <span style={{ fontSize: 10, textAlign: "center", color: i <= idx ? COLOR.text : COLOR.textMuted, maxWidth: 76 }}>{s}</span>
+              </div>
+              {i < SURV_STEPS.length - 1 && <div style={{ flex: 1, height: 1.5, background: i < idx ? COLOR.forest : COLOR.border, marginBottom: 16 }} />}
+            </React.Fragment>
+          );
+        })}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         <div>
@@ -2667,7 +2671,7 @@ function AdminRulesPage({ showToast }) {
       {adding && (
         <Modal title="Add rule" onClose={() => setAdding(false)}>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <LabeledInput label="Rule name" placeholder="e.g. Fever + reduced appetite" value="" onChange={() => {}} />
+            <LabeledInput label="Rule name" placeholder="e.g. Fever + reduced appetite" value="" onChange={() => { }} />
             <div style={{ background: COLOR.surfaceSunken, borderRadius: 8, padding: 12, fontSize: 12.5 }}>
               <div style={{ fontWeight: 700, marginBottom: 6 }}>IF</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}><select style={{ padding: "6px 8px", borderRadius: 6, border: `1px solid ${COLOR.border}`, fontSize: 12.5 }}><option>Symptom = Fever</option></select><span style={{ color: COLOR.textMuted, alignSelf: "center" }}>AND</span><select style={{ padding: "6px 8px", borderRadius: 6, border: `1px solid ${COLOR.border}`, fontSize: 12.5 }}><option>Duration &gt; 48h</option></select></div>
@@ -3160,16 +3164,17 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
               </div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 10.5, fontWeight: 700, color: COLOR.clay, background: COLOR.clayTint, padding: "3px 9px", borderRadius: 16 }}>DEMO MODE</div>
             </>
-                    ) : step === "authorityRoleChoice" ? (
+          ) : step === "authorityRoleChoice" ? (
             <>
               <button type="button" onClick={() => setStep("groupChoice")} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>← Back</button>
               <h2 style={{ fontSize: 19, fontWeight: 700, marginBottom: 6 }}>Authority Access</h2>
               <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Choose your specific authority role.</div>
-              
+
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: COLOR.surfaceSunken, padding: "12px 16px", borderRadius: 10, border: `1px solid ${COLOR.border}`, marginBottom: 12 }}>
                 <span style={{ fontSize: 20 }}>👉</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.text }}>Login as Admin for full access (Login for prototype login suggestion)</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.text }}>Login as Admin for full access</div>
+                  <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 4 }}>(suggested for prototype version)</div>
                   <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 4 }}>(This highlight and access will be removed when launched at full scale)</div>
                 </div>
               </div>
