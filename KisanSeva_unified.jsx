@@ -3307,7 +3307,7 @@ function MobileApp({ cases, addCase, updateCase, alerts, updateAlert, advisories
     </div>
   );
 }
-\nexport default function App() {
+export default function App() {
   const isMobileDevice = useIsMobile();
   const [authed, setAuthed] = useState(false);
   const [publicMode, setPublicMode] = useState(isMobileDevice);
