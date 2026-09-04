@@ -3098,12 +3098,23 @@ async function hashPassword(pw) {
 }
 
 function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode }) {
-  const [step, setStep] = useState("role");
+  // step: "groupChoice" | "authorityRoleChoice" | "credentials"
+  const [step, setStep] = useState("groupChoice");
   const [role, setRole] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phase, setPhase] = useState("idle");
   const [hashPreview, setHashPreview] = useState("");
+
+  const chooseGroup = (group) => {
+    if (group === "farmer") {
+      const farmerRole = ROLES.find(r => r.id === "farmer");
+      setRole(farmerRole);
+      setStep("credentials");
+    } else {
+      setStep("authorityRoleChoice");
+    }
+  };
 
   const chooseRole = (r) => { setRole(r); setStep("credentials"); };
 
@@ -3139,24 +3150,43 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
 
       <div style={{ flex: 1.2, display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}>
         <div style={{ width: "100%", maxWidth: 420 }}>
-          {step === "role" ? (
+          {step === "groupChoice" ? (
             <>
               <h2 style={{ fontSize: 19, fontWeight: 700, marginBottom: 6 }}>Sign in</h2>
-              <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Choose your role to continue.</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
-                {ROLES.map((r) => (
-                  <button key={r.id} onClick={() => chooseRole(r)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px", borderRadius: 10, border: `1px solid ${COLOR.border}`, background: COLOR.surface, cursor: "pointer", textAlign: "left" }}>
-                    <span style={{ fontSize: 18 }}>{r.icon}</span>
-                    <span><div style={{ fontSize: 12.5, fontWeight: 700, color: COLOR.text }}>{r.label}</div><div style={{ fontSize: 10.5, color: COLOR.textMuted }}>{r.sub}</div></span>
-                  </button>
-                ))}
+              <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Are you signing in as a farmer, or as an authority-side user?</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
+                <BigButton icon="🌾" title="Farmer login" subtitle="Report a problem, track your cases" onClick={() => chooseGroup("farmer")} />
+                <BigButton icon="🏛️" title="Authority login" subtitle="Call console, authority, expert, surveillance or admin" variant="secondary" onClick={() => chooseGroup("authority")} />
               </div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 10.5, fontWeight: 700, color: COLOR.clay, background: COLOR.clayTint, padding: "3px 9px", borderRadius: 16 }}>DEMO MODE</div>
-              <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 6 }}>You can switch between roles after signing in.</div>
+            </>
+          ) : step === "authorityRoleChoice" ? (
+            <>
+              <button type="button" onClick={() => setStep("groupChoice")} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>← Back</button>
+              <h2 style={{ fontSize: 19, fontWeight: 700, marginBottom: 6 }}>Authority Access</h2>
+              <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Choose your specific authority role.</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
+                {ROLES.filter(r => r.id !== "farmer").map((r) => {
+                  const isAdmin = r.id === "admin";
+                  return (
+                    <button key={r.id} onClick={() => chooseRole(r)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px", borderRadius: 10, border: isAdmin ? `2px solid ${COLOR.red}` : `1px solid ${COLOR.border}`, background: isAdmin ? COLOR.redTint : COLOR.surface, cursor: "pointer", textAlign: "left", position: "relative" }}>
+                      <span style={{ fontSize: 18 }}>{r.icon}</span>
+                      <span><div style={{ fontSize: 12.5, fontWeight: 700, color: isAdmin ? COLOR.red : COLOR.text }}>{r.label}</div><div style={{ fontSize: 10.5, color: COLOR.textMuted }}>{r.sub}</div></span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: COLOR.surfaceSunken, padding: "12px 16px", borderRadius: 10, border: `1px solid ${COLOR.border}`, marginTop: 20 }}>
+                <span style={{ fontSize: 20 }}>👉</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.text }}>Login as Admin for full access (Login for prototype login suggestion)</div>
+                  <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 4 }}>(This highlight and access will be removed when launched at full scale)</div>
+                </div>
+              </div>
             </>
           ) : (
             <form onSubmit={submit}>
-              <button type="button" onClick={() => { setStep("role"); setPhase("idle"); }} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>← Change role</button>
+              <button type="button" onClick={() => { setStep(role.id === "farmer" ? "groupChoice" : "authorityRoleChoice"); setPhase("idle"); }} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>← Change role</button>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
                 <span style={{ fontSize: 24 }}>{role.icon}</span>
                 <div><div style={{ fontSize: 17, fontWeight: 700 }}>Sign in as {role.label}</div><div style={{ fontSize: 11.5, color: COLOR.textMuted }}>{role.sub}</div></div>
@@ -3188,6 +3218,21 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
 }
 
 function RoleSwitcherBar({ activeRole, setActiveRole, onSignOut, darkMode, setDarkMode }) {
+  if (activeRole !== "admin") {
+    return (
+      <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 26, height: 26, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12 }}>K</div>
+          <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
+          <button onClick={onSignOut} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: `1px solid ${COLOR.border}`, borderRadius: 7, padding: "6px 11px", cursor: "pointer", fontSize: 12, color: COLOR.textSecondary }}><LogOut size={12} /> Sign out</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
