@@ -3215,39 +3215,8 @@ function RoleSwitcherBar({ activeRole, setActiveRole, onSignOut, darkMode, setDa
 
 /* ============================================================
    MOBILE GATEWAY (new, additive — auto-shown on narrow viewports)
-   Desktop app above this is untouched. On a real mobile device
-   the app opens straight into the public dashboard. A "Sign in"
-   button in the header lets the person choose Farmer login or
-   Authority login; authority login then asks which of the 5
-   authority-side roles to enter, and drops them into a mobile
-   version of that role's screen (same components as desktop,
-   rendered with mobile-friendly layout). Reuses the same shared
-   data (cases/alerts/advisories) throughout.
+   Desktop app above this is untouched.
    ============================================================ */
-
-const AUTHORITY_ROLES = ROLES.filter((r) => r.id !== "farmer");
-
-function MobileTopBar({ title, onSignIn, onSignOut, darkMode, setDarkMode, onBack }) {
-  return (
-    <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, animation: "ksFadeUp 0.4s ease both" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-        {onBack ? (
-          <button onClick={onBack} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", padding: 0, width: 24 }}>←</button>
-        ) : (
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, flexShrink: 0 }}>K</div>
-        )}
-        <span style={{ fontSize: 15.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</span>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-        <button onClick={() => setDarkMode((d) => !d)} title="Toggle dark theme" style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          {darkMode ? <Sun size={14} /> : <Moon size={14} />}
-        </button>
-        {onSignIn && <Button variant="secondary" small onClick={onSignIn}>Sign in</Button>}
-        {onSignOut && <button onClick={onSignOut} title="Sign out" style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><LogOut size={14} /></button>}
-      </div>
-    </div>
-  );
-}
 
 function MobileRoleChoice({ onBack, onChoose }) {
   return (
@@ -3256,21 +3225,7 @@ function MobileRoleChoice({ onBack, onChoose }) {
       <div style={{ padding: "0 0 6px", fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Are you signing in as a farmer, or as an authority-side user?</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <BigButton icon="🌾" title="Farmer login" subtitle="Report a problem, track your cases" onClick={() => onChoose("farmer")} />
-        <BigButton icon="🏛️" title="Authority login" subtitle="Call console, authority, expert, surveillance or admin" variant="secondary" onClick={() => onChoose("authority")} />
-      </div>
-    </div>
-  );
-}
-
-function MobileAuthorityRoleList({ onBack, onChoose }) {
-  return (
-    <div style={{ padding: "8px 18px 90px" }}>
-      <ScreenHeader title="Choose your role" onBack={onBack} />
-      <div style={{ fontSize: 12.5, color: COLOR.textSecondary, margin: "0 0 16px" }}>Choose your role to continue.</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {AUTHORITY_ROLES.map((r) => (
-          <OptionButton key={r.id} icon={r.icon} label={r.label} sublabel={r.sub} onClick={() => onChoose(r)} />
-        ))}
+        <BigButton icon="💻" title="Authority login" subtitle="Call console, authority, expert, surveillance or admin" variant="secondary" onClick={() => onChoose("authority")} />
       </div>
     </div>
   );
@@ -3318,80 +3273,50 @@ function MobileCredentialsForm({ role, onBack, onSignIn, showToast }) {
   );
 }
 
-// Mobile versions of the 5 authority-side role screens — same components/data as
-// desktop, rendered with mobile=true so sidebars collapse to horizontal pill nav
-// and layouts stack to a single column.
-function MobileAuthorityRoleScreen({ role, cases, addCase, updateCase, alerts, updateAlert, advisories, setAdvisories, a11y, setA11y, showToast }) {
-  if (role === "call") return <CallConsoleRole cases={cases} updateCase={updateCase} showToast={showToast} mobile />;
-  if (role === "authority") return <AuthorityRole cases={cases} alerts={alerts} updateAlert={updateAlert} advisories={advisories} showToast={showToast} mobile />;
-  if (role === "expert") return <ExpertRole cases={cases} updateCase={updateCase} advisories={advisories} setAdvisories={setAdvisories} showToast={showToast} mobile />;
-  if (role === "surveillance") return <SurveillanceRole alerts={alerts} updateAlert={updateAlert} advisories={advisories} setAdvisories={setAdvisories} showToast={showToast} mobile />;
-  if (role === "admin") return <AdminRole a11y={a11y} setA11y={setA11y} showToast={showToast} mobile />;
-  return null;
+function MobileAuthorityBlock({ onBack, onForceDesktop }) {
+  return (
+    <div style={{ padding: "8px 18px 90px", textAlign: "center" }}>
+      <ScreenHeader title="Authority Access" onBack={onBack} />
+      <div style={{ marginTop: 40, marginBottom: 24, fontSize: 40 }}>💻</div>
+      <h2 style={{ fontSize: 20, marginBottom: 12 }}>Desktop Required</h2>
+      <p style={{ fontSize: 14, color: COLOR.textSecondary, marginBottom: 30, lineHeight: 1.5 }}>
+        Sorry, you need a laptop or PC for authority access to view the complex maps, metrics, and tools.<br/><br/>
+        Alternatively, you can force the application into desktop mode on your current device.
+      </p>
+      <PrimaryBtn onClick={onForceDesktop}>Start desktop mode</PrimaryBtn>
+    </div>
+  );
 }
 
-function MobileApp({ cases, addCase, updateCase, alerts, updateAlert, advisories, setAdvisories, a11y, setA11y, darkMode, setDarkMode, showToast }) {
-  // view: public | roleChoice | farmerLogin | authorityRoleList | authorityLogin | farmerApp | authorityApp
-  const [view, setView] = useState("public");
-  const [pendingRole, setPendingRole] = useState(null); // authority sub-role chosen, awaiting credentials
-  const [activeAuthorityRole, setActiveAuthorityRole] = useState(null);
-
-  const signOut = () => { setView("public"); setPendingRole(null); setActiveAuthorityRole(null); };
-
-  const titleFor = () => {
-    if (view === "farmerApp") return "Krishi Seva — Farmer";
-    if (view === "authorityApp") return `Krishi Seva — ${AUTHORITY_ROLES.find((r) => r.id === activeAuthorityRole)?.label || ""}`;
-    return "Krishi Seva";
-  };
+function MobileApp({ cases, addCase, updateCase, alerts, updateAlert, advisories, setAdvisories, a11y, setA11y, darkMode, setDarkMode, showToast, onViewDesktop, onBack }) {
+  // view: roleChoice | farmerLogin | authorityBlock | farmerApp
+  const [view, setView] = useState("roleChoice");
+  const signOut = () => { setView("roleChoice"); };
 
   return (
     <div style={{ minHeight: "100dvh", background: COLOR.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif" }}>
-      <GlobalStyles />
-
       {view === "farmerApp" ? (
         <FarmerRole cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} embedded onSignOut={signOut} />
       ) : (
         <>
-          <MobileTopBar
-            title={titleFor()}
-            darkMode={darkMode} setDarkMode={setDarkMode}
-            onBack={view !== "public" && view !== "authorityApp" ? () => {
-              if (view === "roleChoice") setView("public");
-              else if (view === "farmerLogin") setView("roleChoice");
-              else if (view === "authorityRoleList") setView("roleChoice");
-              else if (view === "authorityLogin") setView("authorityRoleList");
-            } : undefined}
-            onSignIn={view === "public" ? () => setView("roleChoice") : undefined}
-            onSignOut={view === "authorityApp" ? signOut : undefined}
-          />
-
-          {view === "public" && <PublicRole cases={cases} alerts={alerts} advisories={advisories} />}
-          {view === "roleChoice" && <MobileRoleChoice onBack={() => setView("public")} onChoose={(choice) => setView(choice === "farmer" ? "farmerLogin" : "authorityRoleList")} />}
+          {view === "roleChoice" && <MobileRoleChoice onBack={onBack} onChoose={(choice) => setView(choice === "farmer" ? "farmerLogin" : "authorityBlock")} />}
           {view === "farmerLogin" && <MobileCredentialsForm role={{ id: "farmer", label: "Farmer", sub: "Report a problem, track cases", icon: "🌾" }} onBack={() => setView("roleChoice")} onSignIn={() => setView("farmerApp")} showToast={showToast} />}
-          {view === "authorityRoleList" && <MobileAuthorityRoleList onBack={() => setView("roleChoice")} onChoose={(r) => { setPendingRole(r); setView("authorityLogin"); }} />}
-          {view === "authorityLogin" && pendingRole && <MobileCredentialsForm role={pendingRole} onBack={() => setView("authorityRoleList")} onSignIn={() => { setActiveAuthorityRole(pendingRole.id); setView("authorityApp"); }} showToast={showToast} />}
-          {view === "authorityApp" && activeAuthorityRole && (
-            <MobileAuthorityRoleScreen
-              role={activeAuthorityRole} cases={cases} addCase={addCase} updateCase={updateCase}
-              alerts={alerts} updateAlert={updateAlert} advisories={advisories} setAdvisories={setAdvisories}
-              a11y={a11y} setA11y={setA11y} showToast={showToast}
-            />
-          )}
+          {view === "authorityBlock" && <MobileAuthorityBlock onBack={() => setView("roleChoice")} onForceDesktop={onViewDesktop} />}
         </>
       )}
     </div>
   );
 }
-
-export default function App() {
+\nexport default function App() {
+  const isMobileDevice = useIsMobile();
   const [authed, setAuthed] = useState(false);
-  const [publicMode, setPublicMode] = useState(false);
+  const [publicMode, setPublicMode] = useState(isMobileDevice);
   const [activeRole, setActiveRole] = useState("authority");
   const [toast, setToast] = useState("");
   const [a11y, setA11y] = useState({ textLarge: false, highContrast: false, reducedMotion: false });
   const [darkMode, setDarkMode] = useState(false);
   const [forceDesktop, setForceDesktop] = useState(false);
-  const isMobileDevice = useIsMobile();
+  const [showMobileLogin, setShowMobileLogin] = useState(false);
 
   const [cases, setCases] = useState(INITIAL_CASES);
   const [alerts, setAlerts] = useState(INITIAL_ALERTS);
@@ -3402,7 +3327,7 @@ export default function App() {
   const updateCase = (id, patch) => setCases((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   const updateAlert = (id, patch) => setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
 
-  const signIn = (role) => { setAuthed(true); setPublicMode(false); setActiveRole(role); };
+  const signIn = (role) => { setAuthed(true); setPublicMode(false); setActiveRole(role); setShowMobileLogin(false); };
   const signOut = () => { setAuthed(false); setActiveRole("authority"); };
 
   const wrapperStyle = {
@@ -3412,8 +3337,7 @@ export default function App() {
     filter: themeFilter(darkMode, a11y.highContrast),
   };
 
-  // Mobile preview auto-opens on narrow viewports — desktop flow below is untouched.
-  if (isMobileDevice && !forceDesktop) {
+  if (isMobileDevice && !forceDesktop && showMobileLogin) {
     return (
       <div style={wrapperStyle}>
         <GlobalStyles />
@@ -3421,6 +3345,8 @@ export default function App() {
           cases={cases} addCase={addCase} updateCase={updateCase} alerts={alerts} updateAlert={updateAlert}
           advisories={advisories} setAdvisories={setAdvisories} a11y={a11y} setA11y={setA11y}
           darkMode={darkMode} setDarkMode={setDarkMode} showToast={showToast}
+          onViewDesktop={() => { setShowMobileLogin(false); setForceDesktop(true); setPublicMode(false); }}
+          onBack={() => setShowMobileLogin(false)}
         />
         <GlobalToast msg={toast} />
       </div>
@@ -3431,7 +3357,10 @@ export default function App() {
     return (
       <div style={wrapperStyle}>
         <GlobalStyles />
-        <PublicHeader onSignInClick={() => setPublicMode(false)} darkMode={darkMode} setDarkMode={setDarkMode} />
+        <PublicHeader onSignInClick={() => {
+          if (isMobileDevice && !forceDesktop) setShowMobileLogin(true);
+          else setPublicMode(false);
+        }} darkMode={darkMode} setDarkMode={setDarkMode} />
         <PublicRole cases={cases} alerts={alerts} advisories={advisories} />
         <GlobalToast msg={toast} />
       </div>
