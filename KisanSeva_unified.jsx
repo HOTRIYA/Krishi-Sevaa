@@ -59,12 +59,27 @@ const SOURCE_TONE = {
 
 /* ---------------- Mobile detection + dark theme (additive only) ---------------- */
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth <= 768);
+function DesktopViewportForcer() {
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const meta = document.querySelector('meta[name="viewport"]');
+    const originalContent = meta ? meta.getAttribute('content') : "width=device-width, initial-scale=1.0";
+    if (meta) {
+      meta.setAttribute('content', 'width=1024');
+    }
+    return () => {
+      if (meta) {
+        meta.setAttribute('content', originalContent);
+      }
+    };
+  }, []);
+  return null;
+}
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const agent = typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    setIsMobile(agent);
   }, []);
   return isMobile;
 }
@@ -3480,6 +3495,7 @@ export default function App() {
     }
     return (
       <div style={wrapperStyle}>
+        <DesktopViewportForcer />
         <GlobalStyles />
         <PublicHeader onSignInClick={() => setMobileGate("choice")} darkMode={darkMode} setDarkMode={setDarkMode} />
         <PublicRole cases={cases} alerts={alerts} advisories={advisories} />
