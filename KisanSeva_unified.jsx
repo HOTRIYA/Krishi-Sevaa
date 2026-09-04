@@ -86,6 +86,8 @@ function useIsMobile() {
   return isMobile;
 }
 
+// Zero-touch dark theme: a CSS filter on the outermost wrapper, so none of
+// the existing components or their COLOR usages need to change.
 function themeFilter(darkMode, highContrast) {
   const parts = [];
   if (darkMode) parts.push("invert(0.93) hue-rotate(180deg)");
@@ -699,10 +701,162 @@ const RISK_TREND = [
 const MORTALITY_TREND = [12, 10, 14, 11, 15, 13, 18];
 
 const FARMER_NAME = "Ramesh Choudhary";
+const LANGUAGES = [
+  { code: "en", label: "English" },
+  { code: "hi", label: "हिन्दी" },
+  { code: "mr", label: "मराठी" },
+];
 const FARMER_LANG = {
   en: { namaste: "Namaste 🙏", greeting: "How can we help your livestock today?", reportCta: "Report a problem", reportSub: "Tell us about your animal's health problem.", myReports: "My reports", advisories: "Advisories", nearbyHelp: "Nearby help", urgent: "Need urgent veterinary help?", contactExpert: "Contact nearby expert" },
   hi: { namaste: "नमस्ते 🙏", greeting: "आज हम आपके पशु की कैसे मदद कर सकते हैं?", reportCta: "समस्या दर्ज करें", reportSub: "अपने पशु की स्वास्थ्य समस्या बताएं।", myReports: "मेरी रिपोर्ट", advisories: "सूचनाएं", nearbyHelp: "नज़दीकी सहायता", urgent: "तुरंत पशु चिकित्सा सहायता चाहिए?", contactExpert: "नज़दीकी विशेषज्ञ से संपर्क करें" },
+  mr: { namaste: "नमस्कार 🙏", greeting: "आज आम्ही तुमच्या जनावरांना कशी मदत करू शकतो?", reportCta: "समस्या नोंदवा", reportSub: "तुमच्या जनावराच्या आरोग्य समस्येबद्दल आम्हाला सांगा.", myReports: "माझे अहवाल", advisories: "सूचना", nearbyHelp: "जवळील मदत", urgent: "तातडीने पशुवैद्यकीय मदत हवी आहे?", contactExpert: "जवळच्या तज्ञाशी संपर्क साधा" },
 };
+
+// Generic English-phrase -> {hi, mr} lookup used across every Farmer-app screen.
+// ft(str, lang) returns the translated phrase, or the original string if lang is "en"
+// or no translation is on file (safe fallback, never throws / never blanks the UI).
+const FARMER_I18N = {
+  // header / connectivity
+  "Connected": { hi: "जुड़ा हुआ", mr: "कनेक्ट केलेले" },
+  "Offline, reports will sync later": { hi: "ऑफ़लाइन, रिपोर्ट बाद में सिंक होंगी", mr: "ऑफलाइन, अहवाल नंतर सिंक होतील" },
+  "Change language from here": { hi: "भाषा बदलने के लिए ड्रॉपडाउन ऐरो का उपयोग करें", mr: "भाषा बदलण्यासाठी ड्रॉपडाउन बाणाचा वापर करा" },
+  // bottom nav
+  "Home": { hi: "होम", mr: "मुख्यपृष्ठ" },
+  "Reports": { hi: "रिपोर्ट", mr: "अहवाल" },
+  "Help": { hi: "सहायता", mr: "मदत" },
+  "View": { hi: "देखें", mr: "पहा" },
+  // animal names
+  "Cattle": { hi: "गाय/मवेशी", mr: "गुरे" },
+  "Buffalo": { hi: "भैंस", mr: "म्हैस" },
+  "Goat": { hi: "बकरी", mr: "शेळी" },
+  "Sheep": { hi: "भेड़", mr: "मेंढी" },
+  "Poultry": { hi: "मुर्गी पालन", mr: "कुक्कुटपालन" },
+  "Other": { hi: "अन्य", mr: "इतर" },
+  // symptoms
+  "Fever": { hi: "बुखार", mr: "ताप" },
+  "Not eating": { hi: "खाना नहीं खा रहा", mr: "खात नाही" },
+  "Not drinking": { hi: "पानी नहीं पी रहा", mr: "पाणी पीत नाही" },
+  "Weak / inactive": { hi: "कमज़ोर / सुस्त", mr: "अशक्त / सुस्त" },
+  "Breathing problem": { hi: "सांस लेने में तकलीफ", mr: "श्वास घेण्यास त्रास" },
+  "Diarrhea": { hi: "दस्त", mr: "अतिसार" },
+  "Difficulty walking": { hi: "चलने में कठिनाई", mr: "चालण्यास त्रास" },
+  "Bleeding": { hi: "खून बहना", mr: "रक्तस्त्राव" },
+  "Swelling": { hi: "सूजन", mr: "सूज" },
+  // duration / affected / movement-when options
+  "Today": { hi: "आज", mr: "आज" },
+  "1–2 days": { hi: "1–2 दिन", mr: "1–2 दिवस" },
+  "3–7 days": { hi: "3–7 दिन", mr: "3–7 दिवस" },
+  "More than a week": { hi: "एक सप्ताह से अधिक", mr: "एका आठवड्यापेक्षा जास्त" },
+  "Not sure": { hi: "पक्का नहीं", mr: "खात्री नाही" },
+  "More than 10": { hi: "10 से अधिक", mr: "10 पेक्षा जास्त" },
+  "1–3 days ago": { hi: "1–3 दिन पहले", mr: "1–3 दिवसांपूर्वी" },
+  "Within a week": { hi: "एक सप्ताह के भीतर", mr: "एका आठवड्याच्या आत" },
+  "More than a week ago": { hi: "एक सप्ताह से अधिक पहले", mr: "एका आठवड्यापूर्वीपेक्षा जास्त" },
+  "Yes": { hi: "हाँ", mr: "होय" },
+  "No": { hi: "नहीं", mr: "नाही" },
+  // report flow
+  "Report a problem": { hi: "समस्या दर्ज करें", mr: "समस्या नोंदवा" },
+  "Continue": { hi: "जारी रखें", mr: "पुढे चला" },
+  "What are you reporting?": { hi: "आप क्या रिपोर्ट कर रहे हैं?", mr: "तुम्ही काय नोंदवत आहात?" },
+  "Tell us what's wrong": { hi: "हमें बताएं क्या समस्या है", mr: "आम्हाला काय समस्या आहे ते सांगा" },
+  "Listening…": { hi: "सुन रहे हैं…", mr: "ऐकत आहे…" },
+  "Stop": { hi: "रोकें", mr: "थांबवा" },
+  "Processing…": { hi: "प्रोसेस हो रहा है…", mr: "प्रक्रिया सुरू आहे…" },
+  "You said:": { hi: "आपने कहा:", mr: "तुम्ही सांगितले:" },
+  "✓ Looks correct": { hi: "✓ सही लग रहा है", mr: "✓ बरोबर आहे" },
+  "✎ Edit": { hi: "✎ संपादित करें", mr: "✎ संपादित करा" },
+  "What problem are you seeing?": { hi: "आपको क्या समस्या दिख रही है?", mr: "तुम्हाला काय समस्या दिसत आहे?" },
+  "Tell us in your own words": { hi: "अपने शब्दों में बताएं", mr: "तुमच्या स्वतःच्या शब्दांत सांगा" },
+  "Speak naturally, in your language": { hi: "अपनी भाषा में स्वाभाविक रूप से बोलें", mr: "तुमच्या भाषेत नैसर्गिकपणे बोला" },
+  "or": { hi: "या", mr: "किंवा" },
+  "Type instead": { hi: "इसके बजाय टाइप करें", mr: "त्याऐवजी टाइप करा" },
+  "e.g. My cow has not been eating for two days.": { hi: "जैसे, मेरी गाय दो दिन से कुछ नहीं खा रही।", mr: "उदा. माझी गाय दोन दिवसांपासून काही खात नाही." },
+  "Select symptoms": { hi: "लक्षण चुनें", mr: "लक्षणे निवडा" },
+  "Optional, helps us understand the problem faster.": { hi: "वैकल्पिक, इससे हमें समस्या जल्दी समझने में मदद मिलती है।", mr: "ऐच्छिक, यामुळे आम्हाला समस्या लवकर समजण्यास मदत होते." },
+  "How long has this been happening?": { hi: "यह कब से हो रहा है?", mr: "हे कधीपासून होत आहे?" },
+  "How many animals are affected?": { hi: "कितने पशु प्रभावित हैं?", mr: "किती जनावरे बाधित आहेत?" },
+  "Has any animal died?": { hi: "क्या किसी पशु की मृत्यु हुई है?", mr: "एखाद्या जनावराचा मृत्यू झाला आहे का?" },
+  "How many?": { hi: "कितने?", mr: "किती?" },
+  "Recorded as \"reported mortality\", this does not assume a cause.": { hi: "इसे \"रिपोर्ट की गई मृत्यु\" के रूप में दर्ज किया गया है, यह किसी कारण को नहीं मानता।", mr: "हे \"नोंदवलेला मृत्यू\" म्हणून नोंदवले जाते, यामुळे कोणतेही कारण गृहीत धरले जात नाही." },
+  "Where is the animal?": { hi: "पशु कहाँ है?", mr: "जनावर कुठे आहे?" },
+  "Your location helps us connect you with the correct local veterinary authority.": { hi: "आपका स्थान हमें आपको सही स्थानीय पशु चिकित्सा प्राधिकरण से जोड़ने में मदद करता है।", mr: "तुमचे स्थान आम्हाला योग्य स्थानिक पशुवैद्यकीय प्राधिकरणाशी जोडण्यास मदत करते." },
+  "Location received": { hi: "स्थान प्राप्त हुआ", mr: "स्थान प्राप्त झाले" },
+  "Approximate location captured": { hi: "अनुमानित स्थान दर्ज किया गया", mr: "अंदाजे स्थान नोंदवले गेले" },
+  "📍 Getting your location…": { hi: "📍 आपका स्थान प्राप्त किया जा रहा है…", mr: "📍 तुमचे स्थान मिळवले जात आहे…" },
+  "Krishi Seva would like to use your location to find the right veterinary authority.": { hi: "Krishi Seva सही पशु चिकित्सा प्राधिकरण खोजने के लिए आपके स्थान का उपयोग करना चाहता है।", mr: "योग्य पशुवैद्यकीय प्राधिकरण शोधण्यासाठी Krishi Seva ला तुमचे स्थान वापरायचे आहे." },
+  "Allow": { hi: "अनुमति दें", mr: "परवानगी द्या" },
+  "Not now": { hi: "अभी नहीं", mr: "आत्ता नाही" },
+  "📍 Share location": { hi: "📍 स्थान साझा करें", mr: "📍 स्थान शेअर करा" },
+  "That's okay. You can enter your PIN code instead.": { hi: "कोई बात नहीं। आप इसके बजाय अपना पिन कोड दर्ज कर सकते हैं।", mr: "हरकत नाही. तुम्ही त्याऐवजी तुमचा पिन कोड टाकू शकता." },
+  "Enter PIN code": { hi: "पिन कोड दर्ज करें", mr: "पिन कोड टाका" },
+  "📲 Don't have a smartphone?": { hi: "📲 स्मार्टफोन नहीं है?", mr: "📲 स्मार्टफोन नाही?" },
+  "Call our helpline and follow the voice instructions: Call → Answer questions → Enter PIN → Get expert assistance.": { hi: "हमारी हेल्पलाइन पर कॉल करें और आवाज़ के निर्देशों का पालन करें: कॉल करें → सवालों के जवाब दें → पिन दर्ज करें → विशेषज्ञ सहायता प्राप्त करें।", mr: "आमच्या हेल्पलाइनवर कॉल करा आणि आवाज सूचनांचे पालन करा: कॉल करा → प्रश्नांची उत्तरे द्या → पिन टाका → तज्ञांची मदत मिळवा." },
+  "Has this animal been moved or sent somewhere else recently?": { hi: "क्या इस पशु को हाल ही में कहीं और ले जाया गया है?", mr: "हे जनावर अलीकडेच कुठेतरी हलवले किंवा पाठवले गेले आहे का?" },
+  "Where was it moved from?": { hi: "इसे कहाँ से लाया गया?", mr: "ते कुठून हलवले गेले?" },
+  "Village / locality": { hi: "गाँव / इलाका", mr: "गाव / परिसर" },
+  "Where is it now?": { hi: "यह अभी कहाँ है?", mr: "ते आता कुठे आहे?" },
+  "When was it moved?": { hi: "इसे कब ले जाया गया?", mr: "ते कधी हलवले गेले?" },
+  "Movement information can help veterinary authorities understand whether similar reports are connected across areas. This is recorded as farmer-reported movement, not automatic tracking.": { hi: "आवागमन की जानकारी पशु चिकित्सा प्राधिकरणों को यह समझने में मदद कर सकती है कि क्षेत्रों में समान रिपोर्ट जुड़ी हुई हैं या नहीं। यह किसान द्वारा बताए गए आवागमन के रूप में दर्ज है, स्वचालित ट्रैकिंग नहीं।", mr: "स्थलांतराची माहिती पशुवैद्यकीय प्राधिकरणांना विविध भागांतील समान अहवाल जोडलेले आहेत का हे समजण्यास मदत करू शकते. हे शेतकऱ्याने नोंदवलेले स्थलांतर म्हणून नोंदवले जाते, स्वयंचलित ट्रॅकिंग नाही." },
+  // review step
+  "Review report": { hi: "रिपोर्ट की समीक्षा करें", mr: "अहवालाचे पुनरावलोकन करा" },
+  "Animal": { hi: "पशु", mr: "जनावर" },
+  "Symptoms": { hi: "लक्षण", mr: "लक्षणे" },
+  "Duration": { hi: "अवधि", mr: "कालावधी" },
+  "Affected": { hi: "प्रभावित", mr: "बाधित" },
+  "Mortality": { hi: "मृत्यु दर", mr: "मृत्यूदर" },
+  "Location": { hi: "स्थान", mr: "स्थान" },
+  "Livestock movement": { hi: "पशु आवागमन", mr: "जनावरांचे स्थलांतर" },
+  "Not specified": { hi: "निर्दिष्ट नहीं", mr: "नमूद केलेले नाही" },
+  "animal(s)": { hi: "पशु", mr: "जनावर" },
+  "None reported": { hi: "कोई रिपोर्ट नहीं", mr: "कोणतेही नोंदवलेले नाही" },
+  "GPS location shared": { hi: "GPS स्थान साझा किया गया", mr: "GPS स्थान शेअर केले" },
+  "AI SUMMARY": { hi: "एआई सारांश", mr: "एआय सारांश" },
+  "AI-generated summary, may require expert verification.": { hi: "एआई द्वारा तैयार सारांश, विशेषज्ञ सत्यापन की आवश्यकता हो सकती है।", mr: "एआयने तयार केलेला सारांश, तज्ञांची पडताळणी आवश्यक असू शकते." },
+  "Submit report": { hi: "रिपोर्ट सबमिट करें", mr: "अहवाल सबमिट करा" },
+  "⚠ You're offline, this will be saved on your device and synced later.": { hi: "⚠ आप ऑफ़लाइन हैं, यह आपके डिवाइस पर सहेजा जाएगा और बाद में सिंक होगा।", mr: "⚠ तुम्ही ऑफलाइन आहात, हे तुमच्या डिव्हाइसवर जतन केले जाईल आणि नंतर सिंक होईल." },
+  "Edit": { hi: "संपादित करें", mr: "संपादित करा" },
+  // result screen
+  "Saved on device": { hi: "डिवाइस पर सहेजा गया", mr: "डिव्हाइसवर जतन केले" },
+  "Will sync when internet returns. Your information hasn't been lost.": { hi: "इंटरनेट वापस आने पर सिंक होगा। आपकी जानकारी खोई नहीं है।", mr: "इंटरनेट परत आल्यावर सिंक होईल. तुमची माहिती हरवलेली नाही." },
+  "Back to home": { hi: "होम पर वापस जाएं", mr: "मुख्यपृष्ठावर परत जा" },
+  "● Call in progress": { hi: "● कॉल जारी है", mr: "● कॉल सुरू आहे" },
+  "End call": { hi: "कॉल समाप्त करें", mr: "कॉल संपवा" },
+  "Report received": { hi: "रिपोर्ट प्राप्त हुई", mr: "अहवाल प्राप्त झाला" },
+  "Your case has been created successfully.": { hi: "आपका केस सफलतापूर्वक बनाया गया है।", mr: "तुमची केस यशस्वीरित्या तयार झाली आहे." },
+  "Case ID:": { hi: "केस आईडी:", mr: "केस आयडी:" },
+  "An appropriate veterinary expert is available.": { hi: "एक उपयुक्त पशु चिकित्सा विशेषज्ञ उपलब्ध है।", mr: "एक योग्य पशुवैद्यकीय तज्ञ उपलब्ध आहे." },
+  "Available": { hi: "उपलब्ध", mr: "उपलब्ध" },
+  "Unavailable": { hi: "अनुपलब्ध", mr: "अनुपलब्ध" },
+  "📲 Connect now": { hi: "📲 अभी जुड़ें", mr: "📲 आत्ता कनेक्ट करा" },
+  "View case": { hi: "केस देखें", mr: "केस पहा" },
+  "No expert is currently available": { hi: "फिलहाल कोई विशेषज्ञ उपलब्ध नहीं है", mr: "सध्या कोणताही तज्ञ उपलब्ध नाही" },
+  "You don't need to repeat your report, it's already saved to your case.": { hi: "आपको अपनी रिपोर्ट दोहराने की ज़रूरत नहीं है, यह पहले से ही आपके केस में सहेजी जा चुकी है।", mr: "तुम्हाला तुमचा अहवाल पुन्हा सांगण्याची गरज नाही, तो आधीच तुमच्या केसमध्ये जतन झाला आहे." },
+  "Request callback": { hi: "कॉलबैक का अनुरोध करें", mr: "कॉलबॅकची विनंती करा" },
+  // my reports
+  "My reports": { hi: "मेरी रिपोर्ट", mr: "माझे अहवाल" },
+  "SAVED, WAITING TO SYNC": { hi: "सहेजा गया, सिंक होने की प्रतीक्षा में", mr: "जतन केले, सिंक होण्याच्या प्रतीक्षेत" },
+  "Health problem reported": { hi: "स्वास्थ्य समस्या दर्ज की गई", mr: "आरोग्य समस्या नोंदवली" },
+  "Waiting for connection": { hi: "कनेक्शन की प्रतीक्षा में", mr: "कनेक्शनच्या प्रतीक्षेत" },
+  "SUBMITTED": { hi: "सबमिट किया गया", mr: "सबमिट केले" },
+  "No reports yet.": { hi: "अभी तक कोई रिपोर्ट नहीं।", mr: "अद्याप कोणताही अहवाल नाही." },
+  // case detail
+  "Reported problem": { hi: "रिपोर्ट की गई समस्या", mr: "नोंदवलेली समस्या" },
+  "Expert": { hi: "विशेषज्ञ", mr: "तज्ञ" },
+  "Being assigned": { hi: "असाइन किया जा रहा है", mr: "नियुक्त केले जात आहे" },
+  "Timeline": { hi: "समयरेखा", mr: "कालरेषा" },
+  // advisories
+  "Advisories": { hi: "सूचनाएं", mr: "सूचना" },
+  "Read →": { hi: "पढ़ें →", mr: "वाचा →" },
+  // nearby help
+  "Nearby veterinary help": { hi: "नज़दीकी पशु चिकित्सा सहायता", mr: "जवळील पशुवैद्यकीय मदत" },
+  "Call": { hi: "कॉल करें", mr: "कॉल करा" },
+  "Directions": { hi: "दिशा-निर्देश", mr: "दिशानिर्देश" },
+};
+function ft(str, lang) {
+  if (!str || lang === "en") return str;
+  const entry = FARMER_I18N[str];
+  return (entry && entry[lang]) || str;
+}
 const ANIMALS = [
   { id: "Cow", icon: "🦬", label: "Cattle" }, { id: "Buffalo", icon: "🐃", label: "Buffalo" },
   { id: "Goat", icon: "🐐", label: "Goat" }, { id: "Sheep", icon: "🐏", label: "Sheep" },
@@ -762,6 +916,12 @@ function ProgressDots({ step, total }) {
   return <div style={{ display: "flex", gap: 5, padding: "0 18px 12px" }}>{Array.from({ length: total }).map((_, i) => <div key={i} style={{ height: 4, flex: 1, borderRadius: 3, background: i <= step ? COLOR.forest : COLOR.surfaceSunken }} />)}</div>;
 }
 
+function draftsWaitingText(n, lang) {
+  if (lang === "hi") return `⚠ ${n} रिपोर्ट सिंक होने की प्रतीक्षा में`;
+  if (lang === "mr") return `⚠ ${n} अहवाल सिंक होण्याच्या प्रतीक्षेत`;
+  return `⚠ ${n} report${n > 1 ? "s" : ""} waiting to sync`;
+}
+
 function FarmerHome({ lang, onNavigate, connectivity, drafts }) {
   const t = FARMER_LANG[lang];
   return (
@@ -772,8 +932,8 @@ function FarmerHome({ lang, onNavigate, connectivity, drafts }) {
       </div>
       {drafts.length > 0 && (
         <div style={{ background: COLOR.amberTint, border: `1px solid ${COLOR.amber}33`, borderRadius: 12, padding: "10px 14px", marginBottom: 16, fontSize: 12.5, color: COLOR.amber, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
-          ⚠ {drafts.length} report{drafts.length > 1 ? "s" : ""} waiting to sync
-          <button onClick={() => onNavigate("myReports")} style={{ marginLeft: "auto", background: "none", border: "none", color: COLOR.amber, fontWeight: 700, fontSize: 12.5, cursor: "pointer", textDecoration: "underline" }}>View</button>
+          {draftsWaitingText(drafts.length, lang)}
+          <button onClick={() => onNavigate("myReports")} style={{ marginLeft: "auto", background: "none", border: "none", color: COLOR.amber, fontWeight: 700, fontSize: 12.5, cursor: "pointer", textDecoration: "underline" }}>{ft("View", lang)}</button>
         </div>
       )}
       <div style={{ marginBottom: 14 }}><BigButton icon="🦬" title={t.reportCta.toUpperCase()} subtitle={t.reportSub} onClick={() => onNavigate("report")} /></div>
@@ -788,7 +948,7 @@ function FarmerHome({ lang, onNavigate, connectivity, drafts }) {
       </div>
       <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: connectivity === "online" ? COLOR.green : COLOR.amber, fontWeight: 600 }}>
         <span style={{ width: 7, height: 7, borderRadius: "50%", background: connectivity === "online" ? COLOR.green : COLOR.amber, display: "inline-block" }} />
-        {connectivity === "online" ? "Connected" : "Offline, reports will sync later"}
+        {connectivity === "online" ? ft("Connected", lang) : ft("Offline, reports will sync later", lang)}
       </div>
     </div>
   );
@@ -796,7 +956,7 @@ function FarmerHome({ lang, onNavigate, connectivity, drafts }) {
 
 const FARMER_STEP_TITLES = ["Animal", "Describe", "Symptoms", "Duration", "Affected", "Location", "Movement", "Review"];
 
-function FarmerReportFlow({ onExit, onSubmitted, connectivity }) {
+function FarmerReportFlow({ onExit, onSubmitted, connectivity, lang }) {
   const [step, setStep] = useState(0);
   const [data, setData] = useState({
     animal: null, mode: null, description: "", transcriptConfirmed: false,
@@ -820,40 +980,40 @@ function FarmerReportFlow({ onExit, onSubmitted, connectivity }) {
   };
 
   if (step === FARMER_STEP_TITLES.length - 1) {
-    return <FarmerReviewStep data={data} onBack={back} onEdit={(i) => setStep(i)} onSubmit={() => onSubmitted(data)} connectivity={connectivity} />;
+    return <FarmerReviewStep data={data} onBack={back} onEdit={(i) => setStep(i)} onSubmit={() => onSubmitted(data)} connectivity={connectivity} lang={lang} />;
   }
 
   return (
     <div style={{ paddingBottom: 100 }}>
-      <ScreenHeader title="Report a problem" onBack={back} right={<button onClick={onExit} style={{ background: "none", border: "none", color: COLOR.textMuted, fontSize: 20, cursor: "pointer" }}>✕</button>} />
+      <ScreenHeader title={ft("Report a problem", lang)} onBack={back} right={<button onClick={onExit} style={{ background: "none", border: "none", color: COLOR.textMuted, fontSize: 20, cursor: "pointer" }}>✕</button>} />
       <ProgressDots step={step} total={FARMER_STEP_TITLES.length - 1} />
       <div style={{ padding: "6px 18px" }}>
-        {step === 0 && <FarmerStepAnimal data={data} set={set} />}
-        {step === 1 && <FarmerStepDescribe data={data} set={set} />}
-        {step === 2 && <FarmerStepSymptoms data={data} set={set} />}
-        {step === 3 && <FarmerStepDuration data={data} set={set} />}
-        {step === 4 && <FarmerStepAffected data={data} set={set} />}
-        {step === 5 && <FarmerStepLocation data={data} set={set} />}
-        {step === 6 && <FarmerStepMovement data={data} set={set} />}
+        {step === 0 && <FarmerStepAnimal data={data} set={set} lang={lang} />}
+        {step === 1 && <FarmerStepDescribe data={data} set={set} lang={lang} />}
+        {step === 2 && <FarmerStepSymptoms data={data} set={set} lang={lang} />}
+        {step === 3 && <FarmerStepDuration data={data} set={set} lang={lang} />}
+        {step === 4 && <FarmerStepAffected data={data} set={set} lang={lang} />}
+        {step === 5 && <FarmerStepLocation data={data} set={set} lang={lang} />}
+        {step === 6 && <FarmerStepMovement data={data} set={set} lang={lang} />}
       </div>
       <div style={{ position: "sticky", bottom: 0, background: COLOR.bg, padding: "12px 18px 18px", borderTop: `1px solid ${COLOR.border}` }}>
-        <PrimaryBtn onClick={next} disabled={!canContinue()}>Continue</PrimaryBtn>
+        <PrimaryBtn onClick={next} disabled={!canContinue()}>{ft("Continue", lang)}</PrimaryBtn>
       </div>
     </div>
   );
 }
 
-function FarmerStepAnimal({ data, set }) {
+function FarmerStepAnimal({ data, set, lang }) {
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>What are you reporting?</h2>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>{ft("What are you reporting?", lang)}</h2>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        {ANIMALS.map((a) => <OptionButton key={a.id} icon={a.icon} label={a.label} selected={data.animal === a.id} onClick={() => set({ animal: a.id })} />)}
+        {ANIMALS.map((a) => <OptionButton key={a.id} icon={a.icon} label={ft(a.label, lang)} selected={data.animal === a.id} onClick={() => set({ animal: a.id })} />)}
       </div>
     </div>
   );
 }
-function FarmerStepDescribe({ data, set }) {
+function FarmerStepDescribe({ data, set, lang }) {
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [processing, setProcessing] = useState(false);
@@ -871,19 +1031,19 @@ function FarmerStepDescribe({ data, set }) {
   if (data.mode === "voice" && (recording || processing || data.description)) {
     return (
       <div>
-        <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>Tell us what's wrong</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>{ft("Tell us what's wrong", lang)}</h2>
         {recording && (
           <div style={{ textAlign: "center", padding: "30px 0" }}>
             <div style={{ fontSize: 40, marginBottom: 10 }}>🎤</div>
-            <div style={{ fontSize: 14, color: COLOR.textSecondary, marginBottom: 6 }}>Listening…</div>
+            <div style={{ fontSize: 14, color: COLOR.textSecondary, marginBottom: 6 }}>{ft("Listening…", lang)}</div>
             <div style={{ fontSize: 22, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>00:{String(seconds).padStart(2, "0")}</div>
-            <div style={{ marginTop: 20 }}><GhostBtn full={false} onClick={stopRecording}>Stop</GhostBtn></div>
+            <div style={{ marginTop: 20 }}><GhostBtn full={false} onClick={stopRecording}>{ft("Stop", lang)}</GhostBtn></div>
           </div>
         )}
-        {processing && <div style={{ textAlign: "center", padding: "40px 0", color: COLOR.textSecondary, fontSize: 14 }}>Processing…</div>}
+        {processing && <div style={{ textAlign: "center", padding: "40px 0", color: COLOR.textSecondary, fontSize: 14 }}>{ft("Processing…", lang)}</div>}
         {!recording && !processing && data.description && (
           <div>
-            <div style={{ fontSize: 12.5, color: COLOR.textMuted, marginBottom: 6 }}>You said:</div>
+            <div style={{ fontSize: 12.5, color: COLOR.textMuted, marginBottom: 6 }}>{ft("You said:", lang)}</div>
             {data.transcriptConfirmed ? (
               <textarea value={data.description} onChange={(e) => set({ description: e.target.value })} rows={3} style={{ width: "100%", boxSizing: "border-box", padding: 14, borderRadius: 12, border: `1.5px solid ${COLOR.forest}`, fontSize: 14, fontFamily: "inherit", resize: "vertical" }} />
             ) : (
@@ -891,8 +1051,8 @@ function FarmerStepDescribe({ data, set }) {
             )}
             {!data.transcriptConfirmed && (
               <div style={{ display: "flex", gap: 10 }}>
-                <PrimaryBtn full={false} onClick={() => set({ transcriptConfirmed: true })}>✓ Looks correct</PrimaryBtn>
-                <GhostBtn full={false} onClick={() => set({ transcriptConfirmed: true })}>✎ Edit</GhostBtn>
+                <PrimaryBtn full={false} onClick={() => set({ transcriptConfirmed: true })}>{ft("✓ Looks correct", lang)}</PrimaryBtn>
+                <GhostBtn full={false} onClick={() => set({ transcriptConfirmed: true })}>{ft("✎ Edit", lang)}</GhostBtn>
               </div>
             )}
           </div>
@@ -902,145 +1062,151 @@ function FarmerStepDescribe({ data, set }) {
   }
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>What problem are you seeing?</h2>
-      <div style={{ marginBottom: 12 }}><OptionButton icon="🎤" label="Tell us in your own words" sublabel="Speak naturally, in your language" onClick={startRecording} /></div>
-      <div style={{ textAlign: "center", color: COLOR.textMuted, fontSize: 12, margin: "10px 0" }}>or</div>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>{ft("What problem are you seeing?", lang)}</h2>
+      <div style={{ marginBottom: 12 }}><OptionButton icon="🎤" label={ft("Tell us in your own words", lang)} sublabel={ft("Speak naturally, in your language", lang)} onClick={startRecording} /></div>
+      <div style={{ textAlign: "center", color: COLOR.textMuted, fontSize: 12, margin: "10px 0" }}>{ft("or", lang)}</div>
       <button onClick={() => set({ mode: "type" })} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, background: COLOR.surface, cursor: "pointer", marginBottom: 12 }}>
-        <span style={{ fontSize: 18 }}>⌨️</span><span style={{ fontSize: 13.5, fontWeight: 600 }}>Type instead</span>
+        <span style={{ fontSize: 18 }}>⌨️</span><span style={{ fontSize: 13.5, fontWeight: 600 }}>{ft("Type instead", lang)}</span>
       </button>
       {data.mode === "type" && (
-        <textarea autoFocus value={data.description} onChange={(e) => set({ description: e.target.value })} placeholder="e.g. My cow has not been eating for two days." rows={4} style={{ width: "100%", boxSizing: "border-box", padding: 14, borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14, fontFamily: "inherit", resize: "vertical" }} />
+        <textarea autoFocus value={data.description} onChange={(e) => set({ description: e.target.value })} placeholder={ft("e.g. My cow has not been eating for two days.", lang)} rows={4} style={{ width: "100%", boxSizing: "border-box", padding: 14, borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14, fontFamily: "inherit", resize: "vertical" }} />
       )}
     </div>
   );
 }
-function FarmerStepSymptoms({ data, set }) {
+function FarmerStepSymptoms({ data, set, lang }) {
   const toggle = (id) => { const has = data.symptoms.includes(id); set({ symptoms: has ? data.symptoms.filter((s) => s !== id) : [...data.symptoms, id] }); };
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 6px" }}>Select symptoms</h2>
-      <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 14 }}>Optional, helps us understand the problem faster.</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>{SYMPTOMS.map((s) => <OptionButton key={s.id} icon={s.icon} label={s.label} compact selected={data.symptoms.includes(s.id)} onClick={() => toggle(s.id)} />)}</div>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 6px" }}>{ft("Select symptoms", lang)}</h2>
+      <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 14 }}>{ft("Optional, helps us understand the problem faster.", lang)}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>{SYMPTOMS.map((s) => <OptionButton key={s.id} icon={s.icon} label={ft(s.label, lang)} compact selected={data.symptoms.includes(s.id)} onClick={() => toggle(s.id)} />)}</div>
     </div>
   );
 }
-function FarmerStepDuration({ data, set }) {
+function FarmerStepDuration({ data, set, lang }) {
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>How long has this been happening?</h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{DURATIONS.map((d) => <OptionButton key={d} label={d} selected={data.duration === d} onClick={() => set({ duration: d })} />)}</div>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>{ft("How long has this been happening?", lang)}</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{DURATIONS.map((d) => <OptionButton key={d} label={ft(d, lang)} selected={data.duration === d} onClick={() => set({ duration: d })} />)}</div>
     </div>
   );
 }
-function FarmerStepAffected({ data, set }) {
+function FarmerStepAffected({ data, set, lang }) {
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>How many animals are affected?</h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>{AFFECTED_COUNTS.map((c) => <OptionButton key={c} label={c} selected={data.affected === c} onClick={() => set({ affected: c })} />)}</div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>Has any animal died?</h2>
-      <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>{["Yes", "No", "Not sure"].map((v) => <div key={v} style={{ flex: 1 }}><OptionButton compact label={v} selected={data.mortality === v} onClick={() => set({ mortality: v, mortalityCount: v === "Yes" ? data.mortalityCount : "" })} /></div>)}</div>
-      {data.mortality === "Yes" && <input value={data.mortalityCount} onChange={(e) => set({ mortalityCount: e.target.value })} placeholder="How many?" inputMode="numeric" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} />}
-      <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 10 }}>Recorded as "reported mortality", this does not assume a cause.</div>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>{ft("How many animals are affected?", lang)}</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>{AFFECTED_COUNTS.map((c) => <OptionButton key={c} label={ft(c, lang)} selected={data.affected === c} onClick={() => set({ affected: c })} />)}</div>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>{ft("Has any animal died?", lang)}</h2>
+      <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>{["Yes", "No", "Not sure"].map((v) => <div key={v} style={{ flex: 1 }}><OptionButton compact label={ft(v, lang)} selected={data.mortality === v} onClick={() => set({ mortality: v, mortalityCount: v === "Yes" ? data.mortalityCount : "" })} /></div>)}</div>
+      {data.mortality === "Yes" && <input value={data.mortalityCount} onChange={(e) => set({ mortalityCount: e.target.value })} placeholder={ft("How many?", lang)} inputMode="numeric" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} />}
+      <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 10 }}>{ft("Recorded as \"reported mortality\", this does not assume a cause.", lang)}</div>
     </div>
   );
 }
-function FarmerStepLocation({ data, set }) {
+function FarmerStepLocation({ data, set, lang }) {
   const [asking, setAsking] = useState(false);
   const [acquiring, setAcquiring] = useState(false);
   const share = () => setAsking(true);
   const grantPermission = () => { setAsking(false); setAcquiring(true); setTimeout(() => { setAcquiring(false); set({ locationMethod: "gps", gpsDone: true }); }, 1200); };
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 6px" }}>Where is the animal?</h2>
-      <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Your location helps us connect you with the correct local veterinary authority.</div>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 6px" }}>{ft("Where is the animal?", lang)}</h2>
+      <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>{ft("Your location helps us connect you with the correct local veterinary authority.", lang)}</div>
       {data.gpsDone ? (
         <div style={{ background: COLOR.greenTint, borderRadius: 12, padding: 14, display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 18 }}>✓</span>
-          <div><div style={{ fontSize: 14, fontWeight: 700, color: COLOR.green }}>Location received</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>Approximate location captured</div></div>
+          <div><div style={{ fontSize: 14, fontWeight: 700, color: COLOR.green }}>{ft("Location received", lang)}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{ft("Approximate location captured", lang)}</div></div>
         </div>
       ) : acquiring ? (
-        <div style={{ textAlign: "center", padding: "20px 0", color: COLOR.textSecondary, fontSize: 13.5 }}>📍 Getting your location…</div>
+        <div style={{ textAlign: "center", padding: "20px 0", color: COLOR.textSecondary, fontSize: 13.5 }}>{ft("📍 Getting your location…", lang)}</div>
       ) : asking ? (
         <div style={{ background: COLOR.blueTint, borderRadius: 12, padding: 16 }}>
-          <div style={{ fontSize: 13.5, color: COLOR.text, marginBottom: 14 }}>Krishi Seva would like to use your location to find the right veterinary authority.</div>
-          <div style={{ display: "flex", gap: 10 }}><PrimaryBtn full={false} onClick={grantPermission}>Allow</PrimaryBtn><GhostBtn full={false} onClick={() => setAsking(false)}>Not now</GhostBtn></div>
+          <div style={{ fontSize: 13.5, color: COLOR.text, marginBottom: 14 }}>{ft("Krishi Seva would like to use your location to find the right veterinary authority.", lang)}</div>
+          <div style={{ display: "flex", gap: 10 }}><PrimaryBtn full={false} onClick={grantPermission}>{ft("Allow", lang)}</PrimaryBtn><GhostBtn full={false} onClick={() => setAsking(false)}>{ft("Not now", lang)}</GhostBtn></div>
         </div>
       ) : (
-        <><div style={{ marginBottom: 12 }}><PrimaryBtn onClick={share}>📍 Share location</PrimaryBtn></div><div style={{ textAlign: "center", color: COLOR.textMuted, fontSize: 12, margin: "10px 0" }}>or</div></>
+        <><div style={{ marginBottom: 12 }}><PrimaryBtn onClick={share}>{ft("📍 Share location", lang)}</PrimaryBtn></div><div style={{ textAlign: "center", color: COLOR.textMuted, fontSize: 12, margin: "10px 0" }}>{ft("or", lang)}</div></>
       )}
       {!data.gpsDone && !acquiring && (
         <div style={{ marginTop: 12 }}>
-          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 8 }}>That's okay. You can enter your PIN code instead.</div>
-          <input value={data.pin} onChange={(e) => set({ pin: e.target.value.replace(/\D/g, "").slice(0, 6), locationMethod: "pin" })} placeholder="Enter PIN code" inputMode="numeric" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} />
+          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 8 }}>{ft("That's okay. You can enter your PIN code instead.", lang)}</div>
+          <input value={data.pin} onChange={(e) => set({ pin: e.target.value.replace(/\D/g, "").slice(0, 6), locationMethod: "pin" })} placeholder={ft("Enter PIN code", lang)} inputMode="numeric" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} />
         </div>
       )}
       <div style={{ marginTop: 24, background: COLOR.surfaceSunken, borderRadius: 12, padding: 14 }}>
-        <div style={{ fontSize: 12.5, fontWeight: 700, color: COLOR.text, marginBottom: 4 }}>📲 Don't have a smartphone?</div>
-        <div style={{ fontSize: 12, color: COLOR.textSecondary }}>Call our helpline and follow the voice instructions: Call → Answer questions → Enter PIN → Get expert assistance.</div>
+        <div style={{ fontSize: 12.5, fontWeight: 700, color: COLOR.text, marginBottom: 4 }}>{ft("📲 Don't have a smartphone?", lang)}</div>
+        <div style={{ fontSize: 12, color: COLOR.textSecondary }}>{ft("Call our helpline and follow the voice instructions: Call → Answer questions → Enter PIN → Get expert assistance.", lang)}</div>
       </div>
     </div>
   );
 }
-function FarmerStepMovement({ data, set }) {
+function FarmerStepMovement({ data, set, lang }) {
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>Has this animal been moved or sent somewhere else recently?</h2>
-      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>{["Yes", "No", "Not sure"].map((v) => <div key={v} style={{ flex: 1 }}><OptionButton compact label={v} selected={data.movement === v} onClick={() => set({ movement: v })} /></div>)}</div>
+      <h2 style={{ fontSize: 16, fontWeight: 700, margin: "4px 0 14px" }}>{ft("Has this animal been moved or sent somewhere else recently?", lang)}</h2>
+      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>{["Yes", "No", "Not sure"].map((v) => <div key={v} style={{ flex: 1 }}><OptionButton compact label={ft(v, lang)} selected={data.movement === v} onClick={() => set({ movement: v })} /></div>)}</div>
       {data.movement === "Yes" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div><div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 6 }}>Where was it moved from?</div><input value={data.moveFrom} onChange={(e) => set({ moveFrom: e.target.value })} placeholder="Village / locality" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} /></div>
-          <div><div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 6 }}>Where is it now?</div><input value={data.moveTo} onChange={(e) => set({ moveTo: e.target.value })} placeholder="Village / locality" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} /></div>
+          <div><div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 6 }}>{ft("Where was it moved from?", lang)}</div><input value={data.moveFrom} onChange={(e) => set({ moveFrom: e.target.value })} placeholder={ft("Village / locality", lang)} style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} /></div>
+          <div><div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 6 }}>{ft("Where is it now?", lang)}</div><input value={data.moveTo} onChange={(e) => set({ moveTo: e.target.value })} placeholder={ft("Village / locality", lang)} style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} /></div>
           <div>
-            <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 8 }}>When was it moved?</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{MOVE_WHEN.map((w) => <OptionButton key={w} compact label={w} selected={data.moveWhen === w} onClick={() => set({ moveWhen: w })} />)}</div>
+            <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 8 }}>{ft("When was it moved?", lang)}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{MOVE_WHEN.map((w) => <OptionButton key={w} compact label={ft(w, lang)} selected={data.moveWhen === w} onClick={() => set({ moveWhen: w })} />)}</div>
           </div>
-          <div style={{ fontSize: 11.5, color: COLOR.textMuted }}>Movement information can help veterinary authorities understand whether similar reports are connected across areas. This is recorded as farmer-reported movement, not automatic tracking.</div>
+          <div style={{ fontSize: 11.5, color: COLOR.textMuted }}>{ft("Movement information can help veterinary authorities understand whether similar reports are connected across areas. This is recorded as farmer-reported movement, not automatic tracking.", lang)}</div>
         </div>
       )}
     </div>
   );
 }
-function FarmerReviewStep({ data, onBack, onEdit, onSubmit, connectivity }) {
+function FarmerReviewStep({ data, onBack, onEdit, onSubmit, connectivity, lang }) {
   const animal = ANIMALS.find((a) => a.id === data.animal);
   const symptomLabels = data.symptoms;
+  const mortalityValue = data.mortality === "Yes"
+    ? (lang === "hi" ? `रिपोर्ट की गई, ${data.mortalityCount || "?"}` : lang === "mr" ? `नोंदवले, ${data.mortalityCount || "?"}` : `Reported, ${data.mortalityCount || "?"}`)
+    : data.mortality === "No" ? ft("None reported", lang) : ft("Not sure", lang);
+  const movementValue = data.movement === "Yes"
+    ? `${ft("Yes", lang)}, ${data.moveFrom || "?"} → ${data.moveTo || "?"}`
+    : (data.movement ? ft(data.movement, lang) : "—");
   return (
     <div style={{ paddingBottom: 110 }}>
-      <ScreenHeader title="Review report" onBack={onBack} />
+      <ScreenHeader title={ft("Review report", lang)} onBack={onBack} />
       <div style={{ padding: "6px 18px" }}>
         <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 16, marginBottom: 14 }}>
-          <FarmerRowKV label="Animal" value={`${animal?.icon} ${animal?.label}`} onEdit={() => onEdit(0)} />
-          <FarmerRowKV label="Symptoms" value={symptomLabels.length ? symptomLabels.join(", ") : "Not specified"} onEdit={() => onEdit(2)} />
-          <FarmerRowKV label="Duration" value={data.duration || "—"} onEdit={() => onEdit(3)} />
-          <FarmerRowKV label="Affected" value={`${data.affected || "—"} animal(s)`} onEdit={() => onEdit(4)} />
-          <FarmerRowKV label="Mortality" value={data.mortality === "Yes" ? `Reported, ${data.mortalityCount || "?"}` : data.mortality === "No" ? "None reported" : "Not sure"} onEdit={() => onEdit(4)} />
-          <FarmerRowKV label="Location" value={data.gpsDone ? "GPS location shared" : data.pin ? `PIN ${data.pin}` : "—"} onEdit={() => onEdit(5)} />
-          <FarmerRowKV label="Livestock movement" value={data.movement === "Yes" ? `Yes, ${data.moveFrom || "?"} → ${data.moveTo || "?"}` : data.movement || "—"} onEdit={() => onEdit(6)} last />
+          <FarmerRowKV label={ft("Animal", lang)} value={`${animal?.icon} ${ft(animal?.label, lang)}`} onEdit={() => onEdit(0)} editLabel={ft("Edit", lang)} />
+          <FarmerRowKV label={ft("Symptoms", lang)} value={symptomLabels.length ? symptomLabels.map((s) => ft(s, lang)).join(", ") : ft("Not specified", lang)} onEdit={() => onEdit(2)} editLabel={ft("Edit", lang)} />
+          <FarmerRowKV label={ft("Duration", lang)} value={data.duration ? ft(data.duration, lang) : "—"} onEdit={() => onEdit(3)} editLabel={ft("Edit", lang)} />
+          <FarmerRowKV label={ft("Affected", lang)} value={`${data.affected ? ft(data.affected, lang) : "—"} ${ft("animal(s)", lang)}`} onEdit={() => onEdit(4)} editLabel={ft("Edit", lang)} />
+          <FarmerRowKV label={ft("Mortality", lang)} value={mortalityValue} onEdit={() => onEdit(4)} editLabel={ft("Edit", lang)} />
+          <FarmerRowKV label={ft("Location", lang)} value={data.gpsDone ? ft("GPS location shared", lang) : data.pin ? `PIN ${data.pin}` : "—"} onEdit={() => onEdit(5)} editLabel={ft("Edit", lang)} />
+          <FarmerRowKV label={ft("Livestock movement", lang)} value={movementValue} onEdit={() => onEdit(6)} editLabel={ft("Edit", lang)} last />
         </div>
         <div style={{ background: COLOR.surfaceSunken, borderRadius: 14, padding: 16, marginBottom: 16 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, marginBottom: 6 }}>AI SUMMARY</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, marginBottom: 6 }}>{ft("AI SUMMARY", lang)}</div>
           <div style={{ fontSize: 13.5, color: COLOR.text, lineHeight: 1.6, marginBottom: 8, fontStyle: "italic" }}>
             "Farmer reports a{animal?.label === "Other" ? "n" : ""} {animal?.label?.toLowerCase()} with {symptomLabels.length ? symptomLabels.join(", ").toLowerCase() : "a health problem"}{data.duration ? `, duration ${data.duration.toLowerCase()}` : ""}."
           </div>
-          <div style={{ fontSize: 11, color: COLOR.textMuted }}>AI-generated summary, may require expert verification.</div>
+          <div style={{ fontSize: 11, color: COLOR.textMuted }}>{ft("AI-generated summary, may require expert verification.", lang)}</div>
         </div>
       </div>
       <div style={{ position: "sticky", bottom: 0, background: COLOR.bg, padding: "12px 18px 18px", borderTop: `1px solid ${COLOR.border}` }}>
-        <PrimaryBtn onClick={onSubmit}>Submit report</PrimaryBtn>
-        {connectivity !== "online" && <div style={{ fontSize: 11.5, color: COLOR.amber, marginTop: 8, textAlign: "center" }}>⚠ You're offline, this will be saved on your device and synced later.</div>}
+        <PrimaryBtn onClick={onSubmit}>{ft("Submit report", lang)}</PrimaryBtn>
+        {connectivity !== "online" && <div style={{ fontSize: 11.5, color: COLOR.amber, marginTop: 8, textAlign: "center" }}>{ft("⚠ You're offline, this will be saved on your device and synced later.", lang)}</div>}
       </div>
     </div>
   );
 }
-function FarmerRowKV({ label, value, onEdit, last }) {
+function FarmerRowKV({ label, value, onEdit, last, editLabel }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, padding: "10px 0", borderBottom: last ? "none" : `1px solid ${COLOR.border}` }}>
       <div><div style={{ fontSize: 11, color: COLOR.textMuted }}>{label}</div><div style={{ fontSize: 13.5, color: COLOR.text, marginTop: 2 }}>{value}</div></div>
-      <button onClick={onEdit} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>Edit</button>
+      <button onClick={onEdit} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>{editLabel || "Edit"}</button>
     </div>
   );
 }
 
-function FarmerSubmissionResult({ result, onDone, onViewCase }) {
+function FarmerSubmissionResult({ result, onDone, onViewCase, lang }) {
   const [calling, setCalling] = useState(false);
   const [seconds, setSeconds] = useState(0);
   useEffect(() => { let iv; if (calling) iv = setInterval(() => setSeconds((s) => s + 1), 1000); return () => clearInterval(iv); }, [calling]);
@@ -1049,68 +1215,68 @@ function FarmerSubmissionResult({ result, onDone, onViewCase }) {
     return (
       <div style={{ padding: "40px 18px", textAlign: "center" }}>
         <div style={{ fontSize: 44, marginBottom: 14 }}>📥</div>
-        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>Saved on device</div>
-        <div style={{ fontSize: 13.5, color: COLOR.textSecondary, marginBottom: 24 }}>Will sync when internet returns. Your information hasn't been lost.</div>
-        <PrimaryBtn onClick={onDone}>Back to home</PrimaryBtn>
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>{ft("Saved on device", lang)}</div>
+        <div style={{ fontSize: 13.5, color: COLOR.textSecondary, marginBottom: 24 }}>{ft("Will sync when internet returns. Your information hasn't been lost.", lang)}</div>
+        <PrimaryBtn onClick={onDone}>{ft("Back to home", lang)}</PrimaryBtn>
       </div>
     );
   }
   if (calling) {
     return (
       <div style={{ padding: "50px 18px", textAlign: "center" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: COLOR.greenTint, color: COLOR.green, fontWeight: 700, fontSize: 13, padding: "6px 14px", borderRadius: 20, marginBottom: 20 }}>● Call in progress</div>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: COLOR.greenTint, color: COLOR.green, fontWeight: 700, fontSize: 13, padding: "6px 14px", borderRadius: 20, marginBottom: 20 }}>{ft("● Call in progress", lang)}</div>
         <div style={{ fontSize: 26, fontWeight: 700, fontVariantNumeric: "tabular-nums", marginBottom: 28 }}>{String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}</div>
         <div style={{ fontSize: 14, fontWeight: 700 }}>{result.expertName}</div>
         <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 30 }}>{result.expertArea}</div>
-        <GhostBtn full={false} onClick={() => setCalling(false)}>End call</GhostBtn>
+        <GhostBtn full={false} onClick={() => setCalling(false)}>{ft("End call", lang)}</GhostBtn>
       </div>
     );
   }
   return (
     <div style={{ padding: "36px 18px", textAlign: "center" }}>
       <div style={{ fontSize: 44, marginBottom: 10 }}>✅</div>
-      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Report received</div>
-      <div style={{ fontSize: 13.5, color: COLOR.textSecondary, marginBottom: 18 }}>Your case has been created successfully.</div>
-      <div style={{ background: COLOR.surfaceSunken, borderRadius: 12, padding: "10px 16px", display: "inline-block", fontSize: 14, fontWeight: 700, marginBottom: 26 }}>Case ID: {result.caseId}</div>
+      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{ft("Report received", lang)}</div>
+      <div style={{ fontSize: 13.5, color: COLOR.textSecondary, marginBottom: 18 }}>{ft("Your case has been created successfully.", lang)}</div>
+      <div style={{ background: COLOR.surfaceSunken, borderRadius: 12, padding: "10px 16px", display: "inline-block", fontSize: 14, fontWeight: 700, marginBottom: 26 }}>{ft("Case ID:", lang)} {result.caseId}</div>
       {result.available ? (
         <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 18, textAlign: "left" }}>
-          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 10 }}>An appropriate veterinary expert is available.</div>
+          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 10 }}>{ft("An appropriate veterinary expert is available.", lang)}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
             <span style={{ fontSize: 26 }}>🧑‍⚕️</span>
-            <div><div style={{ fontSize: 14, fontWeight: 700 }}>{result.expertName}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{result.expertArea} · <span style={{ color: COLOR.green, fontWeight: 600 }}>Available</span></div></div>
+            <div><div style={{ fontSize: 14, fontWeight: 700 }}>{result.expertName}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{result.expertArea} · <span style={{ color: COLOR.green, fontWeight: 600 }}>{ft("Available", lang)}</span></div></div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}><PrimaryBtn onClick={() => setCalling(true)}>📲 Connect now</PrimaryBtn><GhostBtn onClick={onViewCase}>View case</GhostBtn></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}><PrimaryBtn onClick={() => setCalling(true)}>{ft("📲 Connect now", lang)}</PrimaryBtn><GhostBtn onClick={onViewCase}>{ft("View case", lang)}</GhostBtn></div>
         </div>
       ) : (
         <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 18, textAlign: "left" }}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4 }}>No expert is currently available</div>
-          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>You don't need to repeat your report, it's already saved to your case.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}><PrimaryBtn onClick={onDone}>Request callback</PrimaryBtn><GhostBtn onClick={onViewCase}>View case</GhostBtn></div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, marginBottom: 4 }}>{ft("No expert is currently available", lang)}</div>
+          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>{ft("You don't need to repeat your report, it's already saved to your case.", lang)}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}><PrimaryBtn onClick={onDone}>{ft("Request callback", lang)}</PrimaryBtn><GhostBtn onClick={onViewCase}>{ft("View case", lang)}</GhostBtn></div>
         </div>
       )}
-      <div style={{ marginTop: 20 }}><button onClick={onDone} style={{ background: "none", border: "none", color: COLOR.textMuted, fontSize: 12.5, cursor: "pointer" }}>Back to home</button></div>
+      <div style={{ marginTop: 20 }}><button onClick={onDone} style={{ background: "none", border: "none", color: COLOR.textMuted, fontSize: 12.5, cursor: "pointer" }}>{ft("Back to home", lang)}</button></div>
     </div>
   );
 }
 
-function FarmerMyReports({ myCases, drafts, onBack, onOpenCase }) {
+function FarmerMyReports({ myCases, drafts, onBack, onOpenCase, lang }) {
   return (
     <div style={{ paddingBottom: 90 }}>
-      <ScreenHeader title="My reports" onBack={onBack} />
+      <ScreenHeader title={ft("My reports", lang)} onBack={onBack} />
       <div style={{ padding: "6px 18px" }}>
         {drafts.length > 0 && (
           <>
-            <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, margin: "10px 0 8px" }}>SAVED, WAITING TO SYNC</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, margin: "10px 0 8px" }}>{ft("SAVED, WAITING TO SYNC", lang)}</div>
             {drafts.map((d, i) => (
               <div key={i} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 12, padding: 14, marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><div style={{ fontSize: 13.5, fontWeight: 700 }}>{d.animalLabel}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{d.symptomLabels || "Health problem reported"}</div></div>
-                <Badge fg={COLOR.amber} bg={COLOR.amberTint}>Waiting for connection</Badge>
+                <div><div style={{ fontSize: 13.5, fontWeight: 700 }}>{d.animalLabel}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{d.symptomLabels || ft("Health problem reported", lang)}</div></div>
+                <Badge fg={COLOR.amber} bg={COLOR.amberTint}>{ft("Waiting for connection", lang)}</Badge>
               </div>
             ))}
           </>
         )}
-        <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, margin: "14px 0 8px" }}>SUBMITTED</div>
-        {myCases.length === 0 ? <div style={{ textAlign: "center", color: COLOR.textSecondary, fontSize: 13, padding: "30px 0" }}>No reports yet.</div> : myCases.map((r) => (
+        <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.textMuted, margin: "14px 0 8px" }}>{ft("SUBMITTED", lang)}</div>
+        {myCases.length === 0 ? <div style={{ textAlign: "center", color: COLOR.textSecondary, fontSize: 13, padding: "30px 0" }}>{ft("No reports yet.", lang)}</div> : myCases.map((r) => (
           <button key={r.id} onClick={() => onOpenCase(r)} style={{ width: "100%", textAlign: "left", border: `1px solid ${COLOR.border}`, background: COLOR.surface, borderRadius: 12, padding: 14, marginBottom: 10, cursor: "pointer" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
               <div style={{ fontSize: 12.5, color: COLOR.textMuted, fontWeight: 600 }}>#{r.id}</div>
@@ -1124,18 +1290,18 @@ function FarmerMyReports({ myCases, drafts, onBack, onOpenCase }) {
     </div>
   );
 }
-function FarmerCaseDetail({ report, onBack }) {
+function FarmerCaseDetail({ report, onBack, lang }) {
   return (
     <div style={{ paddingBottom: 90 }}>
-      <ScreenHeader title={`Case #${report.id}`} onBack={onBack} />
+      <ScreenHeader title={`${lang === "hi" ? "केस" : lang === "mr" ? "केस" : "Case"} #${report.id}`} onBack={onBack} />
       <div style={{ padding: "6px 18px" }}>
         <div style={{ display: "flex", gap: 8, marginBottom: 16 }}><RiskBadge level={report.risk} /><StatusBadge status={report.status} /></div>
         <div style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 16, marginBottom: 18 }}>
-          <FarmerRowStatic label="Animal" value={report.animal} />
-          <FarmerRowStatic label="Reported problem" value={report.structured.symptoms.value} />
-          <FarmerRowStatic label="Expert" value={report.expert || "Being assigned"} last />
+          <FarmerRowStatic label={ft("Animal", lang)} value={report.animal} />
+          <FarmerRowStatic label={ft("Reported problem", lang)} value={report.structured.symptoms.value} />
+          <FarmerRowStatic label={ft("Expert", lang)} value={report.expert || ft("Being assigned", lang)} last />
         </div>
-        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Timeline</div>
+        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>{ft("Timeline", lang)}</div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {report.history.map((step, i) => (
             <div key={i} style={{ display: "flex", gap: 10 }}>
@@ -1154,43 +1320,43 @@ function FarmerCaseDetail({ report, onBack }) {
 function FarmerRowStatic({ label, value, last }) {
   return <div style={{ padding: "10px 0", borderBottom: last ? "none" : `1px solid ${COLOR.border}` }}><div style={{ fontSize: 11, color: COLOR.textMuted }}>{label}</div><div style={{ fontSize: 13.5, color: COLOR.text, marginTop: 2 }}>{value}</div></div>;
 }
-function FarmerAdvisories({ onBack, advisories }) {
+function FarmerAdvisories({ onBack, advisories, lang }) {
   const [open, setOpen] = useState(null);
   return (
     <div style={{ paddingBottom: 90 }}>
-      <ScreenHeader title="Advisories" onBack={onBack} />
+      <ScreenHeader title={ft("Advisories", lang)} onBack={onBack} />
       <div style={{ padding: "6px 18px" }}>
         {advisories.Sent.map((a, i) => (
           <div key={i} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 16, marginBottom: 12 }}>
             <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{a.title}</div>
             <div style={{ fontSize: 12, color: COLOR.textMuted, marginBottom: 10 }}>{a.area} · {a.date}</div>
-            {open === i ? <div style={{ fontSize: 13.5, color: COLOR.text, lineHeight: 1.7 }}>{a.message}</div> : <button onClick={() => setOpen(i)} style={{ background: "none", border: "none", color: COLOR.forest, fontWeight: 700, fontSize: 13, cursor: "pointer", padding: 0 }}>Read →</button>}
+            {open === i ? <div style={{ fontSize: 13.5, color: COLOR.text, lineHeight: 1.7 }}>{a.message}</div> : <button onClick={() => setOpen(i)} style={{ background: "none", border: "none", color: COLOR.forest, fontWeight: 700, fontSize: 13, cursor: "pointer", padding: 0 }}>{ft("Read →", lang)}</button>}
           </div>
         ))}
       </div>
     </div>
   );
 }
-function FarmerNearbyHelp({ onBack }) {
+function FarmerNearbyHelp({ onBack, lang }) {
   return (
     <div style={{ paddingBottom: 90 }}>
-      <ScreenHeader title="Nearby veterinary help" onBack={onBack} />
+      <ScreenHeader title={ft("Nearby veterinary help", lang)} onBack={onBack} />
       <div style={{ padding: "6px 18px" }}>
         {NEARBY.map((n, i) => (
           <div key={i} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 14, padding: 16, marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700 }}>{n.name}</div>
-              <div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{n.area} {n.available !== null && <span style={{ color: n.available ? COLOR.green : COLOR.textMuted, fontWeight: 600 }}>· {n.available ? "Available" : "Unavailable"}</span>}</div>
+              <div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{n.area} {n.available !== null && <span style={{ color: n.available ? COLOR.green : COLOR.textMuted, fontWeight: 600 }}>· {n.available ? ft("Available", lang) : ft("Unavailable", lang)}</span>}</div>
             </div>
-            <GhostBtn full={false}>{n.available !== null ? "Call" : "Directions"}</GhostBtn>
+            <GhostBtn full={false}>{n.available !== null ? ft("Call", lang) : ft("Directions", lang)}</GhostBtn>
           </div>
         ))}
       </div>
     </div>
   );
 }
-function FarmerBottomNav({ active, onNavigate }) {
-  const items = [{ id: "home", icon: "🏡", label: "Home" }, { id: "myReports", icon: "📑", label: "Reports" }, { id: "advisories", icon: "📡", label: "Advisories" }, { id: "nearbyHelp", icon: "🧑‍⚕️", label: "Help" }];
+function FarmerBottomNav({ active, onNavigate, lang }) {
+  const items = [{ id: "home", icon: "🏡", label: ft("Home", lang) }, { id: "myReports", icon: "📑", label: ft("Reports", lang) }, { id: "advisories", icon: "📡", label: ft("Advisories", lang) }, { id: "nearbyHelp", icon: "🧑‍⚕️", label: ft("Help", lang) }];
   return (
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: COLOR.surface, borderTop: `1px solid ${COLOR.border}`, display: "flex", padding: "8px 6px" }}>
       {items.map((it) => (
@@ -1198,6 +1364,38 @@ function FarmerBottomNav({ active, onNavigate }) {
           <span style={{ fontSize: 18 }}>{it.icon}</span><span style={{ fontSize: 10.5, fontWeight: active === it.id ? 700 : 500 }}>{it.label}</span>
         </button>
       ))}
+    </div>
+  );
+}
+
+function LanguageDropdown({ lang, setLang }) {
+  const [open, setOpen] = useState(false);
+  const current = LANGUAGES.find((l) => l.code === lang) || LANGUAGES[0];
+  return (
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", fontSize: 11.5, fontWeight: 700, color: COLOR.forest, cursor: "pointer", padding: 0 }}
+      >
+        {current.label}
+        <ChevronDown size={13} color={COLOR.forest} />
+      </button>
+      {open && (
+        <>
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 999 }} />
+          <div style={{ position: "absolute", top: "130%", right: 0, background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 9, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 1000, minWidth: 120, overflow: "hidden" }}>
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => { setLang(l.code); setOpen(false); }}
+                style={{ display: "block", width: "100%", textAlign: "left", padding: "9px 14px", background: l.code === lang ? COLOR.forestTint : "none", border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: l.code === lang ? 700 : 500, color: l.code === lang ? COLOR.forest : COLOR.text }}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1267,8 +1465,8 @@ function FarmerRole({ cases, addCase, updateCase, advisories, embedded, onSignOu
             <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <LanguageTourWrapper>
-              <button onClick={() => setLang((l) => (l === "en" ? "hi" : "en"))} style={{ background: "none", border: "none", fontSize: 11.5, fontWeight: 700, color: COLOR.forest, cursor: "pointer" }}>{lang === "en" ? "हिन्दी" : "English"}</button>
+            <LanguageTourWrapper lang={lang}>
+              <LanguageDropdown lang={lang} setLang={setLang} />
             </LanguageTourWrapper>
             <button onClick={() => setConnectivity((c) => (c === "online" ? "offline" : "online"))} title="Demo: toggle connectivity" style={{ background: "none", border: "none", fontSize: 13, cursor: "pointer" }}>{connectivity === "online" ? "🟢" : "⚠️"}</button>
             {embedded && onSignOut && <button onClick={onSignOut} title="Sign out" style={{ background: "none", border: "none", fontSize: 13, cursor: "pointer", color: COLOR.textSecondary, display: "flex" }}><LogOut size={14} /></button>}
@@ -1276,13 +1474,13 @@ function FarmerRole({ cases, addCase, updateCase, advisories, embedded, onSignOu
         </div>
         <div style={{ height: "calc(100% - 45px)", overflowY: "auto", position: "relative" }}>
           {screen === "home" && <FarmerHome lang={lang} onNavigate={nav} connectivity={connectivity} drafts={drafts} />}
-          {screen === "report" && <FarmerReportFlow onExit={() => nav("home")} onSubmitted={handleSubmit} connectivity={connectivity} />}
-          {screen === "result" && submission && <FarmerSubmissionResult result={submission} onDone={() => nav("home")} onViewCase={() => { setOpenCaseId(myCases[0]?.id); setScreen("caseDetail"); }} />}
-          {screen === "myReports" && <FarmerMyReports myCases={myCases} drafts={drafts} onBack={() => nav("home")} onOpenCase={(r) => { setOpenCaseId(r.id); setScreen("caseDetail"); }} />}
-          {screen === "caseDetail" && openCase && <FarmerCaseDetail report={openCase} onBack={() => nav("myReports")} />}
-          {screen === "advisories" && <FarmerAdvisories onBack={() => nav("home")} advisories={advisories} />}
-          {screen === "nearbyHelp" && <FarmerNearbyHelp onBack={() => nav("home")} />}
-          {["home", "myReports", "advisories", "nearbyHelp"].includes(screen) && <FarmerBottomNav active={screen} onNavigate={nav} />}
+          {screen === "report" && <FarmerReportFlow onExit={() => nav("home")} onSubmitted={handleSubmit} connectivity={connectivity} lang={lang} />}
+          {screen === "result" && submission && <FarmerSubmissionResult result={submission} onDone={() => nav("home")} onViewCase={() => { setOpenCaseId(myCases[0]?.id); setScreen("caseDetail"); }} lang={lang} />}
+          {screen === "myReports" && <FarmerMyReports myCases={myCases} drafts={drafts} onBack={() => nav("home")} onOpenCase={(r) => { setOpenCaseId(r.id); setScreen("caseDetail"); }} lang={lang} />}
+          {screen === "caseDetail" && openCase && <FarmerCaseDetail report={openCase} onBack={() => nav("myReports")} lang={lang} />}
+          {screen === "advisories" && <FarmerAdvisories onBack={() => nav("home")} advisories={advisories} lang={lang} />}
+          {screen === "nearbyHelp" && <FarmerNearbyHelp onBack={() => nav("home")} lang={lang} />}
+          {["home", "myReports", "advisories", "nearbyHelp"].includes(screen) && <FarmerBottomNav active={screen} onNavigate={nav} lang={lang} />}
         </div>
       </div>
     </div>
@@ -1733,6 +1931,7 @@ function ExpertSidebar({ nav, setNav, mobile }) {
   );
 }
 
+// Shared horizontal, scrollable pill nav used in place of a 200px sidebar on mobile.
 function MobileSidebarPills({ items, nav, setNav }) {
   return (
     <div style={{ display: "flex", gap: 6, padding: "10px 12px", overflowX: "auto", borderBottom: `1px solid ${COLOR.border}`, WebkitOverflowScrolling: "touch" }}>
@@ -2853,6 +3052,7 @@ function AdminRole({ a11y, setA11y, showToast, mobile }) {
   );
 }
 
+
 const PUBLIC_BLOCKS = ["Sanganer", "Bagru", "Chomu", "Amer", "Phulera"];
 
 const PUBLIC_MAP_CENTER = [26.91, 75.64];
@@ -3117,7 +3317,7 @@ async function hashPassword(pw) {
 }
 
 function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode }) {
-
+  // step: "groupChoice" | "authorityRoleChoice" | "credentials"
   const [step, setStep] = useState("groupChoice");
   const [role, setRole] = useState(null);
   const [email, setEmail] = useState("");
@@ -3281,9 +3481,19 @@ function RoleSwitcherBar({ activeRole, setActiveRole, loggedInRole, onSignOut, d
 }
 
 /* ============================================================
+   MOBILE SIGN-IN GATE (new, additive)
+   On a real phone, the site opens straight into the (desktop)
+   Public Dashboard components — no asking, no chrome switch.
+   Tapping "Sign in" offers Farmer login or Authority login:
+   Farmer signs in and goes straight into the farmer app; Authority
+   is blocked on phones ("you need a laptop/PC, or Start desktop
+   mode") since the authority-side screens are desktop-only.
+   Desktop browsers, and phones that opt into "Start desktop mode",
+   are completely unaffected — they get the original, untouched
+   desktop flow below.
    ============================================================ */
 
-function LanguageTourWrapper({ children }) {
+function LanguageTourWrapper({ children, lang }) {
   const [showTour, setShowTour] = useState(true);
 
   useEffect(() => {
@@ -3309,15 +3519,15 @@ function LanguageTourWrapper({ children }) {
       `}</style>
       {children}
       {showTour && (
-        <div style={{
-          position: "absolute", top: "120%", right: 0,
-          background: COLOR.blue, color: "#fff", padding: "10px 14px",
-          borderRadius: 8, fontSize: 13, fontWeight: 600, width: 200,
+        <div style={{ 
+          position: "absolute", top: "120%", right: 0, 
+          background: COLOR.blue, color: "#fff", padding: "10px 14px", 
+          borderRadius: 8, fontSize: 13, fontWeight: 600, width: 230, 
           boxShadow: "0 8px 24px rgba(0,0,0,0.2)", zIndex: 1000,
           animation: "ksFloatTour 2.5s infinite ease-in-out"
         }}>
           <div style={{ position: "absolute", top: -6, right: 15, width: 12, height: 12, background: COLOR.blue, transform: "rotate(45deg)" }}></div>
-          Change language from here
+          {ft("Change language from here", lang)}
         </div>
       )}
     </div>
@@ -3326,7 +3536,7 @@ function LanguageTourWrapper({ children }) {
 
 function MobileGateHeader({ title, onBack, darkMode, setDarkMode, rightExtra }) {
   return (
-    <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+        <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
         <button onClick={onBack} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", padding: 0, width: 24 }}>←</button>
         <span style={{ fontSize: 15.5, fontWeight: 700 }}>{title}</span>
@@ -3489,7 +3699,7 @@ export default function App() {
 
   const isMobileGateActive = isMobileDevice && !forceDesktop;
 
-  // ----------------------------------------------------------------
+  // ---- Mobile, not in desktop mode, and already signed in as a farmer: full-screen farmer app. ----
   if (isMobileGateActive && authed && activeRole === "farmer") {
     return (
       <div style={wrapperStyle}>
@@ -3500,7 +3710,7 @@ export default function App() {
     );
   }
 
-  // ----------------------------------------------------------------
+  // ---- Mobile, not in desktop mode, not signed in: public dashboard by default, with a lightweight sign-in gate. ----
   if (isMobileGateActive && !authed) {
     if (mobileGate === "choice") {
       return (
@@ -3539,7 +3749,7 @@ export default function App() {
     );
   }
 
-  // ----------------------------------------------------------------
+  // ---- Everyone else (real desktop browsers, or a phone that opted into "Start desktop mode"): original, untouched desktop flow. ----
   if (!authed && publicMode) {
     return (
       <div style={wrapperStyle}>
