@@ -2938,7 +2938,7 @@ function PublicHeader({ onSignInClick, darkMode, setDarkMode }) {
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
-        <Button variant="secondary" small onClick={onSignInClick}>Authority login</Button>
+        <Button variant="secondary" small onClick={onSignInClick}>Sign in</Button>
       </div>
     </div>
   );
@@ -3214,69 +3214,46 @@ function RoleSwitcherBar({ activeRole, setActiveRole, onSignOut, darkMode, setDa
 }
 
 /* ============================================================
-   MOBILE GATEWAY (new, additive — auto-shown on narrow viewports)
-   Desktop app above this is untouched. On a real mobile device
-   the app opens straight into the public dashboard. A "Sign in"
-   button in the header lets the person choose Farmer login or
-   Authority login; authority login then asks which of the 5
-   authority-side roles to enter, and drops them into a mobile
-   version of that role's screen (same components as desktop,
-   rendered with mobile-friendly layout). Reuses the same shared
-   data (cases/alerts/advisories) throughout.
+   MOBILE SIGN-IN GATE (new, additive)
+   On a real phone, the site opens straight into the (desktop)
+   Public Dashboard components — no asking, no chrome switch.
+   Tapping "Sign in" offers Farmer login or Authority login:
+   Farmer signs in and goes straight into the farmer app; Authority
+   is blocked on phones ("you need a laptop/PC, or Start desktop
+   mode") since the authority-side screens are desktop-only.
+   Desktop browsers, and phones that opt into "Start desktop mode",
+   are completely unaffected — they get the original, untouched
+   desktop flow below.
    ============================================================ */
 
-const AUTHORITY_ROLES = ROLES.filter((r) => r.id !== "farmer");
-
-function MobileTopBar({ title, onSignIn, onSignOut, darkMode, setDarkMode, onBack }) {
+function MobileGateHeader({ title, onBack, darkMode, setDarkMode }) {
   return (
-    <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, animation: "ksFadeUp 0.4s ease both" }}>
+    <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-        {onBack ? (
-          <button onClick={onBack} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", padding: 0, width: 24 }}>←</button>
-        ) : (
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, flexShrink: 0 }}>K</div>
-        )}
-        <span style={{ fontSize: 15.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</span>
+        <button onClick={onBack} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", padding: 0, width: 24 }}>←</button>
+        <span style={{ fontSize: 15.5, fontWeight: 700 }}>{title}</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-        <button onClick={() => setDarkMode((d) => !d)} title="Toggle dark theme" style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          {darkMode ? <Sun size={14} /> : <Moon size={14} />}
-        </button>
-        {onSignIn && <Button variant="secondary" small onClick={onSignIn}>Sign in</Button>}
-        {onSignOut && <button onClick={onSignOut} title="Sign out" style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><LogOut size={14} /></button>}
-      </div>
+      <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
     </div>
   );
 }
 
-function MobileRoleChoice({ onBack, onChoose }) {
+function MobileRoleChoice({ onBack, onChoose, darkMode, setDarkMode }) {
   return (
-    <div style={{ padding: "8px 18px 90px" }}>
-      <ScreenHeader title="Sign in" onBack={onBack} />
-      <div style={{ padding: "0 0 6px", fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Are you signing in as a farmer, or as an authority-side user?</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <BigButton icon="🌾" title="Farmer login" subtitle="Report a problem, track your cases" onClick={() => onChoose("farmer")} />
-        <BigButton icon="🏛️" title="Authority login" subtitle="Call console, authority, expert, surveillance or admin" variant="secondary" onClick={() => onChoose("authority")} />
+    <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
+      <MobileGateHeader title="Sign in" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div style={{ padding: "20px 18px 90px" }}>
+        <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Are you signing in as a farmer, or as an authority-side user?</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <BigButton icon="🌾" title="Farmer login" subtitle="Report a problem, track your cases" onClick={() => onChoose("farmer")} />
+          <BigButton icon="🏛️" title="Authority login" subtitle="Call console, authority, expert, surveillance or admin" variant="secondary" onClick={() => onChoose("authority")} />
+        </div>
       </div>
     </div>
   );
 }
 
-function MobileAuthorityRoleList({ onBack, onChoose }) {
-  return (
-    <div style={{ padding: "8px 18px 90px" }}>
-      <ScreenHeader title="Choose your role" onBack={onBack} />
-      <div style={{ fontSize: 12.5, color: COLOR.textSecondary, margin: "0 0 16px" }}>Choose your role to continue.</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {AUTHORITY_ROLES.map((r) => (
-          <OptionButton key={r.id} icon={r.icon} label={r.label} sublabel={r.sub} onClick={() => onChoose(r)} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MobileCredentialsForm({ role, onBack, onSignIn, showToast }) {
+function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phase, setPhase] = useState("idle");
@@ -3291,107 +3268,62 @@ function MobileCredentialsForm({ role, onBack, onSignIn, showToast }) {
   };
 
   return (
-    <div style={{ padding: "8px 18px 90px" }}>
-      <ScreenHeader title={`Sign in as ${role.label}`} onBack={onBack} />
-      <form onSubmit={submit} style={{ marginTop: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-          <span style={{ fontSize: 26 }}>{role.icon}</span>
-          <div style={{ fontSize: 12.5, color: COLOR.textSecondary }}>{role.sub}</div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 10 }}>
-          <div>
-            <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Email</div>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={`${role.id}@Krishi Seva.gov.in`} style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+    <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
+      <MobileGateHeader title="Sign in as Farmer" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div style={{ padding: "20px 18px 90px" }}>
+        <form onSubmit={submit}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 10 }}>
+            <div>
+              <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Email</div>
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="farmer@Krishi Seva.gov.in" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Password</div>
+              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Password</div>
-            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+          <div style={{ fontSize: 10.5, color: COLOR.textMuted, marginBottom: 18 }}>🛡️ Password is hashed (SHA-256) in your browser before it's used.</div>
+          <PrimaryBtn disabled={phase !== "idle"}>{phase === "hashing" ? "Encrypting…" : phase === "signing" ? "Signing in…" : "Sign in"}</PrimaryBtn>
+          <div style={{ textAlign: "center", marginTop: 14 }}>
+            <button type="button" onClick={() => showToast("OTP would be sent to the registered number")} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>Login with OTP</button>
           </div>
-        </div>
-        <div style={{ fontSize: 10.5, color: COLOR.textMuted, marginBottom: 18 }}>🛡️ Password is hashed (SHA-256) in your browser before it's used.</div>
-        <PrimaryBtn disabled={phase !== "idle"}>{phase === "hashing" ? "Encrypting…" : phase === "signing" ? "Signing in…" : "Sign in"}</PrimaryBtn>
-        <div style={{ textAlign: "center", marginTop: 14 }}>
-          <button type="button" onClick={() => showToast("OTP would be sent to the registered number")} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>Login with OTP</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
 
-// Mobile versions of the 5 authority-side role screens — same components/data as
-// desktop, rendered with mobile=true so sidebars collapse to horizontal pill nav
-// and layouts stack to a single column.
-function MobileAuthorityRoleScreen({ role, cases, addCase, updateCase, alerts, updateAlert, advisories, setAdvisories, a11y, setA11y, showToast }) {
-  if (role === "call") return <CallConsoleRole cases={cases} updateCase={updateCase} showToast={showToast} mobile />;
-  if (role === "authority") return <AuthorityRole cases={cases} alerts={alerts} updateAlert={updateAlert} advisories={advisories} showToast={showToast} mobile />;
-  if (role === "expert") return <ExpertRole cases={cases} updateCase={updateCase} advisories={advisories} setAdvisories={setAdvisories} showToast={showToast} mobile />;
-  if (role === "surveillance") return <SurveillanceRole alerts={alerts} updateAlert={updateAlert} advisories={advisories} setAdvisories={setAdvisories} showToast={showToast} mobile />;
-  if (role === "admin") return <AdminRole a11y={a11y} setA11y={setA11y} showToast={showToast} mobile />;
-  return null;
-}
-
-function MobileApp({ cases, addCase, updateCase, alerts, updateAlert, advisories, setAdvisories, a11y, setA11y, darkMode, setDarkMode, showToast }) {
-  // view: public | roleChoice | farmerLogin | authorityRoleList | authorityLogin | farmerApp | authorityApp
-  const [view, setView] = useState("public");
-  const [pendingRole, setPendingRole] = useState(null); // authority sub-role chosen, awaiting credentials
-  const [activeAuthorityRole, setActiveAuthorityRole] = useState(null);
-
-  const signOut = () => { setView("public"); setPendingRole(null); setActiveAuthorityRole(null); };
-
-  const titleFor = () => {
-    if (view === "farmerApp") return "Krishi Seva — Farmer";
-    if (view === "authorityApp") return `Krishi Seva — ${AUTHORITY_ROLES.find((r) => r.id === activeAuthorityRole)?.label || ""}`;
-    return "Krishi Seva";
-  };
-
+function MobileAuthorityBlocked({ onBack, onStartDesktop, darkMode, setDarkMode }) {
   return (
-    <div style={{ minHeight: "100dvh", background: COLOR.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif" }}>
-      <GlobalStyles />
-
-      {view === "farmerApp" ? (
-        <FarmerRole cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} embedded onSignOut={signOut} />
-      ) : (
-        <>
-          <MobileTopBar
-            title={titleFor()}
-            darkMode={darkMode} setDarkMode={setDarkMode}
-            onBack={view !== "public" && view !== "authorityApp" ? () => {
-              if (view === "roleChoice") setView("public");
-              else if (view === "farmerLogin") setView("roleChoice");
-              else if (view === "authorityRoleList") setView("roleChoice");
-              else if (view === "authorityLogin") setView("authorityRoleList");
-            } : undefined}
-            onSignIn={view === "public" ? () => setView("roleChoice") : undefined}
-            onSignOut={view === "authorityApp" ? signOut : undefined}
-          />
-
-          {view === "public" && <PublicRole cases={cases} alerts={alerts} advisories={advisories} />}
-          {view === "roleChoice" && <MobileRoleChoice onBack={() => setView("public")} onChoose={(choice) => setView(choice === "farmer" ? "farmerLogin" : "authorityRoleList")} />}
-          {view === "farmerLogin" && <MobileCredentialsForm role={{ id: "farmer", label: "Farmer", sub: "Report a problem, track cases", icon: "🌾" }} onBack={() => setView("roleChoice")} onSignIn={() => setView("farmerApp")} showToast={showToast} />}
-          {view === "authorityRoleList" && <MobileAuthorityRoleList onBack={() => setView("roleChoice")} onChoose={(r) => { setPendingRole(r); setView("authorityLogin"); }} />}
-          {view === "authorityLogin" && pendingRole && <MobileCredentialsForm role={pendingRole} onBack={() => setView("authorityRoleList")} onSignIn={() => { setActiveAuthorityRole(pendingRole.id); setView("authorityApp"); }} showToast={showToast} />}
-          {view === "authorityApp" && activeAuthorityRole && (
-            <MobileAuthorityRoleScreen
-              role={activeAuthorityRole} cases={cases} addCase={addCase} updateCase={updateCase}
-              alerts={alerts} updateAlert={updateAlert} advisories={advisories} setAdvisories={setAdvisories}
-              a11y={a11y} setA11y={setA11y} showToast={showToast}
-            />
-          )}
-        </>
-      )}
+    <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
+      <MobileGateHeader title="Authority login" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div style={{ padding: "24px 18px 90px" }}>
+        <div style={{ background: COLOR.amberTint, border: `1px solid ${COLOR.amber}33`, borderRadius: 14, padding: 20, marginBottom: 20 }}>
+          <div style={{ fontSize: 30, marginBottom: 10 }}>💻</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: COLOR.text, marginBottom: 6 }}>Sorry, you need a laptop or PC for authority access</div>
+          <div style={{ fontSize: 13, color: COLOR.textSecondary, lineHeight: 1.6 }}>The Call Console, Authority, Expert, Surveillance and Admin workspaces are built for larger screens. You can still use them from this phone by switching to desktop mode below.</div>
+        </div>
+        <PrimaryBtn onClick={onStartDesktop}><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Monitor size={16} /> Start desktop mode</span></PrimaryBtn>
+        <div style={{ textAlign: "center", marginTop: 14 }}>
+          <button type="button" onClick={onBack} style={{ background: "none", border: "none", color: COLOR.textSecondary, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>← Go back</button>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function App() {
   const [authed, setAuthed] = useState(false);
-  const [publicMode, setPublicMode] = useState(false);
+  // Public dashboard is the default landing view for everyone, mobile and desktop alike — no login prompt up front.
+  const [publicMode, setPublicMode] = useState(true);
   const [activeRole, setActiveRole] = useState("authority");
   const [toast, setToast] = useState("");
   const [a11y, setA11y] = useState({ textLarge: false, highContrast: false, reducedMotion: false });
   const [darkMode, setDarkMode] = useState(false);
   const [forceDesktop, setForceDesktop] = useState(false);
   const isMobileDevice = useIsMobile();
+  // Sub-stage of the lightweight mobile sign-in gate: null | "choice" | "farmerLogin" | "authorityBlocked"
+  const [mobileGate, setMobileGate] = useState(null);
 
   const [cases, setCases] = useState(INITIAL_CASES);
   const [alerts, setAlerts] = useState(INITIAL_ALERTS);
@@ -3403,7 +3335,7 @@ export default function App() {
   const updateAlert = (id, patch) => setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
 
   const signIn = (role) => { setAuthed(true); setPublicMode(false); setActiveRole(role); };
-  const signOut = () => { setAuthed(false); setActiveRole("authority"); };
+  const signOut = () => { setAuthed(false); setActiveRole("authority"); setPublicMode(true); setMobileGate(null); };
 
   const wrapperStyle = {
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif",
@@ -3412,21 +3344,41 @@ export default function App() {
     filter: themeFilter(darkMode, a11y.highContrast),
   };
 
-  // Mobile preview auto-opens on narrow viewports — desktop flow below is untouched.
-  if (isMobileDevice && !forceDesktop) {
+  const isMobileGateActive = isMobileDevice && !forceDesktop;
+
+  // ---- Mobile, not in desktop mode, and already signed in as a farmer: full-screen farmer app. ----
+  if (isMobileGateActive && authed && activeRole === "farmer") {
     return (
       <div style={wrapperStyle}>
         <GlobalStyles />
-        <MobileApp
-          cases={cases} addCase={addCase} updateCase={updateCase} alerts={alerts} updateAlert={updateAlert}
-          advisories={advisories} setAdvisories={setAdvisories} a11y={a11y} setA11y={setA11y}
-          darkMode={darkMode} setDarkMode={setDarkMode} showToast={showToast}
-        />
+        <FarmerRole cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} embedded onSignOut={signOut} />
         <GlobalToast msg={toast} />
       </div>
     );
   }
 
+  // ---- Mobile, not in desktop mode, not signed in: public dashboard by default, with a lightweight sign-in gate. ----
+  if (isMobileGateActive && !authed) {
+    if (mobileGate === "choice") {
+      return <MobileRoleChoice onBack={() => setMobileGate(null)} darkMode={darkMode} setDarkMode={setDarkMode} onChoose={(choice) => setMobileGate(choice === "farmer" ? "farmerLogin" : "authorityBlocked")} />;
+    }
+    if (mobileGate === "farmerLogin") {
+      return <MobileFarmerLogin onBack={() => setMobileGate("choice")} onSignIn={() => { setMobileGate(null); signIn("farmer"); }} showToast={showToast} darkMode={darkMode} setDarkMode={setDarkMode} />;
+    }
+    if (mobileGate === "authorityBlocked") {
+      return <MobileAuthorityBlocked onBack={() => setMobileGate("choice")} onStartDesktop={() => { setForceDesktop(true); setMobileGate(null); setPublicMode(false); }} darkMode={darkMode} setDarkMode={setDarkMode} />;
+    }
+    return (
+      <div style={wrapperStyle}>
+        <GlobalStyles />
+        <PublicHeader onSignInClick={() => setMobileGate("choice")} darkMode={darkMode} setDarkMode={setDarkMode} />
+        <PublicRole cases={cases} alerts={alerts} advisories={advisories} />
+        <GlobalToast msg={toast} />
+      </div>
+    );
+  }
+
+  // ---- Everyone else (real desktop browsers, or a phone that opted into "Start desktop mode"): original, untouched desktop flow. ----
   if (!authed && publicMode) {
     return (
       <div style={wrapperStyle}>
