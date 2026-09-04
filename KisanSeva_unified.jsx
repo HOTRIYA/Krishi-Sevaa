@@ -64,7 +64,7 @@ function DesktopViewportForcer() {
     const meta = document.querySelector('meta[name="viewport"]');
     const originalContent = meta ? meta.getAttribute('content') : "width=device-width, initial-scale=1.0";
     if (meta) {
-      meta.setAttribute('content', 'width=1024');
+      meta.setAttribute('content', 'width=1024, initial-scale=0.1, maximum-scale=10.0');
     }
     return () => {
       if (meta) {
