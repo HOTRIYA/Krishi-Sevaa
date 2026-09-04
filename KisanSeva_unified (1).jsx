@@ -1187,7 +1187,7 @@ function FarmerBottomNav({ active, onNavigate }) {
   );
 }
 
-function FarmerRole({ cases, addCase, updateCase, advisories }) {
+function FarmerRole({ cases, addCase, updateCase, advisories, embedded, onSignOut }) {
   const [lang, setLang] = useState("en");
   const [connectivity, setConnectivity] = useState("online");
   const [screen, setScreen] = useState("home");
@@ -1236,9 +1236,16 @@ function FarmerRole({ cases, addCase, updateCase, advisories }) {
   const nav = (id) => { setScreen(id); setOpenCaseId(null); };
   const openCase = myCases.find((c) => c.id === openCaseId);
 
+  const frameStyle = embedded
+    ? { width: "100%", background: COLOR.bg, overflow: "hidden", position: "relative", height: "100dvh" }
+    : { width: 390, maxWidth: "100%", background: COLOR.bg, borderRadius: 30, border: "8px solid #2A2C26", boxShadow: "0 20px 50px rgba(0,0,0,0.25)", overflow: "hidden", position: "relative", height: 760, maxHeight: "88vh" };
+  const outerStyle = embedded
+    ? { minHeight: "100dvh", background: COLOR.bg }
+    : { minHeight: "100%", background: "#EDE7D6", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "28px 12px" };
+
   return (
-    <div style={{ minHeight: "100%", background: "#EDE7D6", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "28px 12px" }}>
-      <div style={{ width: 390, maxWidth: "100%", background: COLOR.bg, borderRadius: 30, border: "8px solid #2A2C26", boxShadow: "0 20px 50px rgba(0,0,0,0.25)", overflow: "hidden", position: "relative", height: 760, maxHeight: "88vh" }}>
+    <div style={outerStyle}>
+      <div style={frameStyle}>
         <div style={{ background: COLOR.surface, borderBottom: `1px solid ${COLOR.border}`, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 24, height: 24, borderRadius: 6, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11 }}>K</div>
@@ -1247,6 +1254,7 @@ function FarmerRole({ cases, addCase, updateCase, advisories }) {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <button onClick={() => setLang((l) => (l === "en" ? "hi" : "en"))} style={{ background: "none", border: "none", fontSize: 11.5, fontWeight: 700, color: COLOR.forest, cursor: "pointer" }}>{lang === "en" ? "हिन्दी" : "English"}</button>
             <button onClick={() => setConnectivity((c) => (c === "online" ? "offline" : "online"))} title="Demo: toggle connectivity" style={{ background: "none", border: "none", fontSize: 13, cursor: "pointer" }}>{connectivity === "online" ? "🟢" : "⚠️"}</button>
+            {embedded && onSignOut && <button onClick={onSignOut} title="Sign out" style={{ background: "none", border: "none", fontSize: 13, cursor: "pointer", color: COLOR.textSecondary, display: "flex" }}><LogOut size={14} /></button>}
           </div>
         </div>
         <div style={{ height: "calc(100% - 45px)", overflowY: "auto", position: "relative" }}>
@@ -1321,7 +1329,7 @@ function CallConsoleDetail({ call, onBack, onUpdate, showToast }) {
         </div>
         <RiskBadge level={call.risk} />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 16, marginTop: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginTop: 20 }}>
         <div>
           {call.transcript.length > 0 && (
             <Card title="Conversation">
@@ -1389,12 +1397,12 @@ function CallConsoleDetail({ call, onBack, onUpdate, showToast }) {
   );
 }
 
-function CallConsoleRole({ cases, updateCase, showToast }) {
+function CallConsoleRole({ cases, updateCase, showToast, mobile }) {
   const [selectedId, setSelectedId] = useState(null);
   const calls = cases.filter((c) => c.callState);
   const selected = calls.find((c) => c.id === selectedId);
   return (
-    <div style={{ padding: 24, maxWidth: 1180, margin: "0 auto" }}>
+    <div style={{ padding: mobile ? 14 : 24, maxWidth: 1180, margin: "0 auto" }}>
       {selected ? <CallConsoleDetail call={selected} onBack={() => setSelectedId(null)} onUpdate={updateCase} showToast={showToast} /> : <LiveCallsPage calls={calls} onOpen={setSelectedId} />}
     </div>
   );
@@ -1610,7 +1618,7 @@ function AuthorityCasesTable({ cases, casesRef, showToast }) {
   );
 }
 
-function AuthorityRole({ cases, alerts, updateAlert, advisories, showToast }) {
+function AuthorityRole({ cases, alerts, updateAlert, advisories, showToast, mobile }) {
   const [selectedCluster, setSelectedCluster] = useState(null);
   const [reviewAlert, setReviewAlert] = useState(null);
   const [advisoryOpen, setAdvisoryOpen] = useState(false);
@@ -1625,7 +1633,7 @@ function AuthorityRole({ cases, alerts, updateAlert, advisories, showToast }) {
   const selectedAlert = selectedCluster ? alerts.find((a) => a.highlightVillage === selectedCluster.name) : null;
 
   return (
-    <div style={{ padding: 24, maxWidth: 1280, margin: "0 auto" }}>
+    <div style={{ padding: mobile ? 14 : 24, maxWidth: 1280, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 18 }}>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Overview</h1>
@@ -1639,7 +1647,7 @@ function AuthorityRole({ cases, alerts, updateAlert, advisories, showToast }) {
 
       <AuthorityKPIRow />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: 16, marginBottom: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16, marginBottom: 16, alignItems: "start" }}>
         <div>
           <Card title="Surveillance map" right={<span style={{ fontSize: 11.5, color: COLOR.textMuted }}>Rajasthan / Jaipur</span>}>
             <SurveillanceMap onSelectCluster={setSelectedCluster} />
@@ -1688,12 +1696,13 @@ const EXPERT_KPIS = [
   { icon: CheckCircle2, label: "Resolved today", value: 11, delta: "", tone: "green" },
 ];
 
-function ExpertSidebar({ nav, setNav }) {
+function ExpertSidebar({ nav, setNav, mobile }) {
   const items = [
     { id: "overview", label: "Overview" }, { id: "incoming", label: "Incoming" }, { id: "cases", label: "My cases" },
     { id: "callbacks", label: "Callbacks" }, { id: "lab", label: "Lab referrals" }, { id: "history", label: "Case history" },
     { id: "advisories", label: "Advisories" }, { id: "profile", label: "Profile" },
   ];
+  if (mobile) return <MobileSidebarPills items={items} nav={nav} setNav={setNav} />;
   return (
     <div style={{ width: 200, flexShrink: 0, borderRight: `1px solid ${COLOR.border}`, padding: "16px 10px" }}>
       {items.map((it) => (
@@ -1707,6 +1716,19 @@ function ExpertSidebar({ nav, setNav }) {
   );
 }
 
+// Shared horizontal, scrollable pill nav used in place of a 200px sidebar on mobile.
+function MobileSidebarPills({ items, nav, setNav }) {
+  return (
+    <div style={{ display: "flex", gap: 6, padding: "10px 12px", overflowX: "auto", borderBottom: `1px solid ${COLOR.border}`, WebkitOverflowScrolling: "touch" }}>
+      {items.map((it) => (
+        <button key={it.id} onClick={() => setNav(it.id)} style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, whiteSpace: "nowrap", padding: "7px 13px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: nav === it.id ? 700 : 500, background: nav === it.id ? COLOR.forest : COLOR.surfaceSunken, color: nav === it.id ? "#fff" : COLOR.textSecondary }}>
+          {it.icon && <it.icon size={12} />}{it.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function ExpertHeader({ availability, setAvailability }) {
   const [openMenu, setOpenMenu] = useState(false);
   const [confirmOffline, setConfirmOffline] = useState(false);
@@ -1715,7 +1737,7 @@ function ExpertHeader({ availability, setAvailability }) {
   const AVAIL = { AVAILABLE: { label: "Available", fg: COLOR.green }, BUSY: { label: "Busy", fg: COLOR.amber }, OFFLINE: { label: "Offline", fg: COLOR.textMuted }, ON_LEAVE: { label: "On leave", fg: COLOR.orange } };
   const choose = (val) => { setOpenMenu(false); if (val === "OFFLINE" && availability !== "OFFLINE") { setConfirmOffline(true); return; } setAvailability(val); };
   return (
-    <div style={{ borderBottom: `1px solid ${COLOR.border}`, padding: "16px 26px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative" }}>
+    <div style={{ borderBottom: `1px solid ${COLOR.border}`, padding: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, position: "relative" }}>
       <div><div style={{ fontSize: 17, fontWeight: 700 }}>{greeting}, {LOGGED_IN_EXPERT}</div><div style={{ fontSize: 12.5, color: COLOR.textSecondary }}>Veterinary Officer · Sanganer</div></div>
       <div style={{ position: "relative" }}>
         <button onClick={() => setOpenMenu((o) => !o)} style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 12px", borderRadius: 7, border: `1px solid ${COLOR.border}`, background: COLOR.surface, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
@@ -1925,7 +1947,7 @@ function ExpertCaseDetail({ c, onBack, onAccept, onUpdate, showToast }) {
           )}
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         <div>
           <Card title="Case overview">
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px 20px" }}>
@@ -2080,7 +2102,7 @@ function ExpertProfilePage({ availability }) {
   );
 }
 
-function ExpertRole({ cases, updateCase, advisories, setAdvisories, showToast }) {
+function ExpertRole({ cases, updateCase, advisories, setAdvisories, showToast, mobile }) {
   const [nav, setNav] = useState("overview");
   const [openId, setOpenId] = useState(null);
   const [availability, setAvailability] = useState("AVAILABLE");
@@ -2093,11 +2115,11 @@ function ExpertRole({ cases, updateCase, advisories, setAdvisories, showToast })
   const byBucket = (b) => cases.filter((c) => c.bucket === b && mine(c));
 
   return (
-    <div style={{ display: "flex" }}>
-      <ExpertSidebar nav={nav} setNav={(n) => { setNav(n); setOpenId(null); }} />
+    <div style={{ display: "flex", flexDirection: mobile ? "column" : "row" }}>
+      <ExpertSidebar nav={nav} setNav={(n) => { setNav(n); setOpenId(null); }} mobile={mobile} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <ExpertHeader availability={availability} setAvailability={setAvailability} />
-        <div style={{ padding: 24, maxWidth: 1120, margin: "0 auto" }}>
+        <div style={{ padding: mobile ? 14 : 24, maxWidth: 1120, margin: "0 auto" }}>
           {current ? (
             <ExpertCaseDetail c={current} onBack={closeCase} onAccept={acceptCase} onUpdate={updateCase} showToast={showToast} />
           ) : (
@@ -2195,7 +2217,7 @@ function SurvAlertDetail({ alert: a, onBack, onUpdate, showToast }) {
           </React.Fragment>
         ); })}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         <div>
           <Card title="Map"><MiniMap highlight={a.highlightVillage} /></Card>
           <Card title="Why was this flagged?">
@@ -2305,7 +2327,7 @@ function SurvMovementPage() {
       </div>
       {open ? (
         <Card title={`Movement #${open.id}`} right={<button onClick={() => setOpenId(null)} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>Close</button>}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18 }}>
             <MiniMap highlight={open.destination} />
             <div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px", marginBottom: 12 }}>
@@ -2479,7 +2501,7 @@ function CreateAdvisoryModal({ onClose, onSubmit }) {
   );
 }
 
-function SurveillanceRole({ alerts, updateAlert, advisories, setAdvisories, showToast }) {
+function SurveillanceRole({ alerts, updateAlert, advisories, setAdvisories, showToast, mobile }) {
   const [nav, setNav] = useState("alerts");
   const [openAlertId, setOpenAlertId] = useState(null);
   const items = [
@@ -2488,11 +2510,13 @@ function SurveillanceRole({ alerts, updateAlert, advisories, setAdvisories, show
     { id: "advisories", label: "Advisories", icon: Megaphone },
   ];
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ width: 200, flexShrink: 0, borderRight: `1px solid ${COLOR.border}`, padding: "16px 10px" }}>
-        {items.map((it) => <button key={it.id} onClick={() => setNav(it.id)} style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", textAlign: "left", padding: "9px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontWeight: nav === it.id ? 700 : 500, background: nav === it.id ? COLOR.forestTint : "transparent", color: nav === it.id ? COLOR.forest : COLOR.textSecondary, marginBottom: 2 }}><it.icon size={14} /> {it.label}</button>)}
-      </div>
-      <div style={{ flex: 1, minWidth: 0, padding: 24, maxWidth: 1180, margin: "0 auto" }}>
+    <div style={{ display: "flex", flexDirection: mobile ? "column" : "row" }}>
+      {mobile ? <MobileSidebarPills items={items} nav={nav} setNav={setNav} /> : (
+        <div style={{ width: 200, flexShrink: 0, borderRight: `1px solid ${COLOR.border}`, padding: "16px 10px" }}>
+          {items.map((it) => <button key={it.id} onClick={() => setNav(it.id)} style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", textAlign: "left", padding: "9px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontWeight: nav === it.id ? 700 : 500, background: nav === it.id ? COLOR.forestTint : "transparent", color: nav === it.id ? COLOR.forest : COLOR.textSecondary, marginBottom: 2 }}><it.icon size={14} /> {it.label}</button>)}
+        </div>
+      )}
+      <div style={{ flex: 1, minWidth: 0, padding: mobile ? 14 : 24, maxWidth: 1180, margin: "0 auto" }}>
         {nav === "alerts" && <SurvAlertsPage alerts={alerts} onUpdate={updateAlert} showToast={showToast} openId={openAlertId} setOpenId={setOpenAlertId} />}
         {nav === "clusters" && <SurvClustersPage alerts={alerts} onOpenAlert={(id) => { setOpenAlertId(id); setNav("alerts"); }} />}
         {nav === "movement" && <SurvMovementPage />}
@@ -2784,14 +2808,16 @@ const ADMIN_NAV = [
   { id: "audit", label: "Audit logs", icon: ClipboardList }, { id: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
-function AdminRole({ a11y, setA11y, showToast }) {
+function AdminRole({ a11y, setA11y, showToast, mobile }) {
   const [nav, setNav] = useState("overview");
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ width: 200, flexShrink: 0, borderRight: `1px solid ${COLOR.border}`, padding: "16px 10px" }}>
-        {ADMIN_NAV.map((it) => <button key={it.id} onClick={() => setNav(it.id)} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", padding: "8px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: nav === it.id ? 700 : 500, background: nav === it.id ? COLOR.forestTint : "transparent", color: nav === it.id ? COLOR.forest : COLOR.textSecondary, marginBottom: 2 }}><it.icon size={13} /> {it.label}</button>)}
-      </div>
-      <div style={{ flex: 1, minWidth: 0, padding: 24, maxWidth: 1120, margin: "0 auto" }}>
+    <div style={{ display: "flex", flexDirection: mobile ? "column" : "row" }}>
+      {mobile ? <MobileSidebarPills items={ADMIN_NAV} nav={nav} setNav={setNav} /> : (
+        <div style={{ width: 200, flexShrink: 0, borderRight: `1px solid ${COLOR.border}`, padding: "16px 10px" }}>
+          {ADMIN_NAV.map((it) => <button key={it.id} onClick={() => setNav(it.id)} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", padding: "8px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: nav === it.id ? 700 : 500, background: nav === it.id ? COLOR.forestTint : "transparent", color: nav === it.id ? COLOR.forest : COLOR.textSecondary, marginBottom: 2 }}><it.icon size={13} /> {it.label}</button>)}
+        </div>
+      )}
+      <div style={{ flex: 1, minWidth: 0, padding: mobile ? 14 : 24, maxWidth: 1120, margin: "0 auto" }}>
         {nav === "overview" && <AdminOverview />}
         {nav === "users" && <AdminUsersPage showToast={showToast} />}
         {nav === "experts" && <AdminExpertsPage />}
@@ -3188,182 +3214,171 @@ function RoleSwitcherBar({ activeRole, setActiveRole, onSignOut, darkMode, setDa
 }
 
 /* ============================================================
-   MOBILE PREVIEW (new, additive — auto-shown on narrow viewports)
-   Desktop app above this is untouched. Reuses the same shared
-   data (cases/alerts/advisories) through a purpose-built,
-   phone-friendly shell with a pill nav, styled after the
-   reference: Report / AI Result / Vet / Outbreak.
+   MOBILE GATEWAY (new, additive — auto-shown on narrow viewports)
+   Desktop app above this is untouched. On a real mobile device
+   the app opens straight into the public dashboard. A "Sign in"
+   button in the header lets the person choose Farmer login or
+   Authority login; authority login then asks which of the 5
+   authority-side roles to enter, and drops them into a mobile
+   version of that role's screen (same components as desktop,
+   rendered with mobile-friendly layout). Reuses the same shared
+   data (cases/alerts/advisories) throughout.
    ============================================================ */
 
-function MobilePillNav({ tab, setTab }) {
-  const tabs = [
-    { id: "report", label: "Report" },
-    { id: "ai", label: "AI Result" },
-    { id: "vet", label: "Vet" },
-    { id: "outbreak", label: "Outbreak" },
-  ];
+const AUTHORITY_ROLES = ROLES.filter((r) => r.id !== "farmer");
+
+function MobileTopBar({ title, onSignIn, onSignOut, darkMode, setDarkMode, onBack }) {
   return (
-    <div style={{ display: "flex", gap: 8, padding: "14px 16px", flexWrap: "wrap" }}>
-      {tabs.map((t, i) => (
-        <button
-          key={t.id} onClick={() => setTab(t.id)}
-          className="ks-btn ks-tab-btn"
-          style={{
-            padding: "9px 16px", borderRadius: 20, border: "none", cursor: "pointer",
-            fontSize: 13.5, fontWeight: 600,
-            background: tab === t.id ? COLOR.forest : COLOR.surfaceSunken,
-            color: tab === t.id ? "#fff" : COLOR.textSecondary,
-            transform: tab === t.id ? "scale(1.04)" : "scale(1)",
-            boxShadow: tab === t.id ? "0 4px 12px rgba(30,72,55,0.25)" : "none",
-            animation: `ksFadeUp 0.35s ease both`, animationDelay: `${i * 0.05}s`,
-          }}
-        >
-          {t.label}
+    <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, animation: "ksFadeUp 0.4s ease both" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+        {onBack ? (
+          <button onClick={onBack} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", padding: 0, width: 24 }}>←</button>
+        ) : (
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, flexShrink: 0 }}>K</div>
+        )}
+        <span style={{ fontSize: 15.5, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        <button onClick={() => setDarkMode((d) => !d)} title="Toggle dark theme" style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          {darkMode ? <Sun size={14} /> : <Moon size={14} />}
         </button>
-      ))}
+        {onSignIn && <Button variant="secondary" small onClick={onSignIn}>Sign in</Button>}
+        {onSignOut && <button onClick={onSignOut} title="Sign out" style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><LogOut size={14} /></button>}
+      </div>
     </div>
   );
 }
 
-function MobileReportTab({ cases, addCase, updateCase, advisories }) {
+function MobileRoleChoice({ onBack, onChoose }) {
   return (
-    <div style={{ margin: "-14px -16px 0" }}>
-      <FarmerRole cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} />
+    <div style={{ padding: "8px 18px 90px" }}>
+      <ScreenHeader title="Sign in" onBack={onBack} />
+      <div style={{ padding: "0 0 6px", fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Are you signing in as a farmer, or as an authority-side user?</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <BigButton icon="🌾" title="Farmer login" subtitle="Report a problem, track your cases" onClick={() => onChoose("farmer")} />
+        <BigButton icon="🏛️" title="Authority login" subtitle="Call console, authority, expert, surveillance or admin" variant="secondary" onClick={() => onChoose("authority")} />
+      </div>
     </div>
   );
 }
 
-function MobileAiResultTab({ cases }) {
-  const withAi = cases.filter((c) => c.aiSummary);
-  const [caseId, setCaseId] = useState(withAi[0] && withAi[0].id);
-  const c = cases.find((x) => x.id === caseId) || withAi[0];
-  if (!c) return <EmptyState title="No AI results yet" body="AI summaries appear here once a case is reported." />;
+function MobileAuthorityRoleList({ onBack, onChoose }) {
   return (
-    <div style={{ padding: "0 16px 24px" }}>
-      <div style={{ fontSize: 12, color: COLOR.textMuted, marginBottom: 6 }}>Case</div>
-      <select value={c.id} onChange={(e) => setCaseId(e.target.value)} style={{ width: "100%", boxSizing: "border-box", padding: "9px 10px", borderRadius: 8, border: `1px solid ${COLOR.border}`, fontSize: 13, marginBottom: 14 }}>
-        {withAi.map((x) => <option key={x.id} value={x.id}>#{x.id} — {x.animal} ({x.farmer})</option>)}
-      </select>
-      <Card title="AI-generated summary" right={<RiskBadge level={c.risk} />}>
-        <div style={{ fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>{c.aiSummary}</div>
-        <div style={{ fontSize: 11, color: COLOR.textMuted, marginBottom: 14 }}>⚠ AI-generated — verify with the farmer/expert.</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
-          {Object.entries(c.structured).map(([k, v]) => (
-            <div key={k}><div style={{ fontSize: 10.5, color: COLOR.textMuted, textTransform: "capitalize" }}>{k}</div><div style={{ fontSize: 13, display: "flex", gap: 6, flexWrap: "wrap" }}>{v.value}<SourceTag source={v.source} /></div></div>
-          ))}
-        </div>
-      </Card>
-      <Card title="Risk reasons">
-        {c.riskReasons.map((r, i) => <div key={i} style={{ fontSize: 12.5, marginBottom: 4 }}>✓ {r}</div>)}
-      </Card>
-    </div>
-  );
-}
-
-function MobileVetTab({ cases, showToast }) {
-  const mine = cases.filter((c) => c.expert === LOGGED_IN_EXPERT && !["RESOLVED", "CLOSED"].includes(c.status));
-  const [openId, setOpenId] = useState(null);
-  const open = mine.find((c) => c.id === openId);
-  return (
-    <div style={{ padding: "0 16px 24px" }}>
-      <div style={{ fontSize: 13, color: COLOR.textSecondary, marginBottom: 12 }}>{LOGGED_IN_EXPERT} · {mine.length} active case{mine.length === 1 ? "" : "s"}</div>
-      {open ? (
-        <Card title={`Case #${open.id}`} right={<button onClick={() => setOpenId(null)} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>Close</button>}>
-          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}><RiskBadge level={open.risk} /><StatusBadge status={open.status} /></div>
-          <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 6 }}>{open.animal} · {open.structured.symptoms.value}</div>
-          <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 12 }}>{open.location} · {open.reportedAt}</div>
-          <div style={{ fontSize: 12.5, background: COLOR.surfaceSunken, borderRadius: 8, padding: 10, marginBottom: 12, fontStyle: "italic" }}>{open.aiSummary}</div>
-          <Button variant="primary" icon={Phone} onClick={() => showToast("Calling farmer…")}>Contact farmer</Button>
-        </Card>
-      ) : mine.length === 0 ? (
-        <EmptyState title="You're all caught up" body="No active cases assigned right now." />
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {mine.map((c) => (
-            <div key={c.id} onClick={() => setOpenId(c.id)} style={{ border: `1px solid ${COLOR.border}`, borderRadius: 10, padding: 13, cursor: "pointer" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ fontSize: 12.5, fontWeight: 700, color: COLOR.forest }}>#{c.id}</span><RiskBadge level={c.risk} /></div>
-              <div style={{ fontSize: 13.5, fontWeight: 600 }}>{c.animal} · {c.structured.symptoms.value}</div>
-              <div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{c.location}</div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MobileOutbreakTab({ alerts }) {
-  const flagged = alerts.filter((a) => a.kind === "cluster" && !["DISMISSED"].includes(a.status)).sort((a, b) => b.reports - a.reports);
-  const top = flagged[0];
-  const [selected, setSelected] = useState(top ? top.highlightVillage : "Sanganer");
-  return (
-    <div style={{ padding: "0 16px 24px" }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.forest, marginBottom: 4 }}>District health cell</div>
-      <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 10px" }}>Outbreak watch</h1>
-      <p style={{ fontSize: 14, color: COLOR.textSecondary, marginBottom: 18 }}>Cases are grouped by village to surface early signs of clustering.</p>
-
-      {top ? (
-        <div style={{ background: COLOR.redTint, border: `1px solid ${COLOR.red}22`, borderRadius: 14, padding: 18, marginBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <AlertTriangle size={18} color={COLOR.red} />
-            <span style={{ fontSize: 15, fontWeight: 700, color: COLOR.red }}>Potential outbreak alert</span>
-          </div>
-          <div style={{ fontSize: 13.5, color: COLOR.text, lineHeight: 1.6 }}>
-            {top.block} ({top.reports} cases) — multiple related cases reported in a small area. Recommend dispatching a field team for on-ground verification.
-          </div>
-        </div>
-      ) : (
-        <div style={{ background: COLOR.greenTint, borderRadius: 14, padding: 18, marginBottom: 20, fontSize: 13.5 }}>No unusual clustering detected right now.</div>
-      )}
-
-      <Card title="Jaipur District — case map" right={<div style={{ display: "flex", gap: 10, fontSize: 11 }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: COLOR.red, display: "inline-block" }} />High</span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: COLOR.amber, display: "inline-block" }} />Medium</span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: COLOR.green, display: "inline-block" }} />Low</span>
-      </div>}>
-        <MiniMap highlight={selected} />
-        <div style={{ fontSize: 11, color: COLOR.textMuted, marginTop: 10 }}>Illustrative map for demo purposes — village positions approximate.</div>
-      </Card>
-
-      <Card title="Flagged areas">
-        {flagged.length === 0 ? <EmptyState title="Nothing flagged" body="No potential clusters right now." /> : flagged.map((a) => (
-          <div key={a.id} onClick={() => setSelected(a.highlightVillage)} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: `1px solid ${COLOR.border}`, borderRadius: 9, padding: 12, marginBottom: 8, cursor: "pointer" }}>
-            <div><div style={{ fontSize: 13, fontWeight: 700 }}>{a.block}</div><div style={{ fontSize: 12, color: COLOR.textSecondary }}>{a.reports} reports · baseline {a.baseline}/week</div></div>
-            <PatternBadge status={a.status} />
-          </div>
+    <div style={{ padding: "8px 18px 90px" }}>
+      <ScreenHeader title="Choose your role" onBack={onBack} />
+      <div style={{ fontSize: 12.5, color: COLOR.textSecondary, margin: "0 0 16px" }}>Choose your role to continue.</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {AUTHORITY_ROLES.map((r) => (
+          <OptionButton key={r.id} icon={r.icon} label={r.label} sublabel={r.sub} onClick={() => onChoose(r)} />
         ))}
-      </Card>
+      </div>
     </div>
   );
 }
 
-function MobileApp({ cases, addCase, updateCase, alerts, advisories, darkMode, setDarkMode, onViewDesktop, showToast }) {
-  const [tab, setTab] = useState("outbreak");
+function MobileCredentialsForm({ role, onBack, onSignIn, showToast }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phase, setPhase] = useState("idle");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
+    setPhase("hashing");
+    await hashPassword(password);
+    setPhase("signing");
+    setTimeout(() => onSignIn(), 500);
+  };
+
   return (
-    <div style={{ minHeight: "100vh", background: COLOR.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif" }}>
-      <GlobalStyles />
-      <div style={{ background: COLOR.forest, color: "#fff", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", animation: "ksFadeUp 0.4s ease both" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>K</div>
-          <span style={{ fontSize: 17, fontWeight: 700 }}>Krishi Seva</span>
+    <div style={{ padding: "8px 18px 90px" }}>
+      <ScreenHeader title={`Sign in as ${role.label}`} onBack={onBack} />
+      <form onSubmit={submit} style={{ marginTop: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+          <span style={{ fontSize: 26 }}>{role.icon}</span>
+          <div style={{ fontSize: 12.5, color: COLOR.textSecondary }}>{role.sub}</div>
         </div>
-        <button onClick={() => setDarkMode((d) => !d)} title="Toggle dark theme" style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.12)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          {darkMode ? <Sun size={15} /> : <Moon size={15} />}
-        </button>
-      </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 10 }}>
+          <div>
+            <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Email</div>
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={`${role.id}@Krishi Seva.gov.in`} style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Password</div>
+            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+          </div>
+        </div>
+        <div style={{ fontSize: 10.5, color: COLOR.textMuted, marginBottom: 18 }}>🛡️ Password is hashed (SHA-256) in your browser before it's used.</div>
+        <PrimaryBtn disabled={phase !== "idle"}>{phase === "hashing" ? "Encrypting…" : phase === "signing" ? "Signing in…" : "Sign in"}</PrimaryBtn>
+        <div style={{ textAlign: "center", marginTop: 14 }}>
+          <button type="button" onClick={() => showToast("OTP would be sent to the registered number")} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>Login with OTP</button>
+        </div>
+      </form>
+    </div>
+  );
+}
 
-      <MobilePillNav tab={tab} setTab={setTab} />
+// Mobile versions of the 5 authority-side role screens — same components/data as
+// desktop, rendered with mobile=true so sidebars collapse to horizontal pill nav
+// and layouts stack to a single column.
+function MobileAuthorityRoleScreen({ role, cases, addCase, updateCase, alerts, updateAlert, advisories, setAdvisories, a11y, setA11y, showToast }) {
+  if (role === "call") return <CallConsoleRole cases={cases} updateCase={updateCase} showToast={showToast} mobile />;
+  if (role === "authority") return <AuthorityRole cases={cases} alerts={alerts} updateAlert={updateAlert} advisories={advisories} showToast={showToast} mobile />;
+  if (role === "expert") return <ExpertRole cases={cases} updateCase={updateCase} advisories={advisories} setAdvisories={setAdvisories} showToast={showToast} mobile />;
+  if (role === "surveillance") return <SurveillanceRole alerts={alerts} updateAlert={updateAlert} advisories={advisories} setAdvisories={setAdvisories} showToast={showToast} mobile />;
+  if (role === "admin") return <AdminRole a11y={a11y} setA11y={setA11y} showToast={showToast} mobile />;
+  return null;
+}
 
-      {tab === "report" && <MobileReportTab cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} />}
-      {tab === "ai" && <MobileAiResultTab cases={cases} />}
-      {tab === "vet" && <MobileVetTab cases={cases} showToast={showToast} />}
-      {tab === "outbreak" && <MobileOutbreakTab alerts={alerts} />}
+function MobileApp({ cases, addCase, updateCase, alerts, updateAlert, advisories, setAdvisories, a11y, setA11y, darkMode, setDarkMode, showToast }) {
+  // view: public | roleChoice | farmerLogin | authorityRoleList | authorityLogin | farmerApp | authorityApp
+  const [view, setView] = useState("public");
+  const [pendingRole, setPendingRole] = useState(null); // authority sub-role chosen, awaiting credentials
+  const [activeAuthorityRole, setActiveAuthorityRole] = useState(null);
 
-      <div style={{ textAlign: "center", padding: "10px 16px 26px" }}>
-        <button onClick={onViewDesktop} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: `1px solid ${COLOR.border}`, borderRadius: 20, padding: "8px 16px", fontSize: 12, color: COLOR.textSecondary, cursor: "pointer" }}>
-          <Monitor size={13} /> View full desktop experience
-        </button>
-      </div>
+  const signOut = () => { setView("public"); setPendingRole(null); setActiveAuthorityRole(null); };
+
+  const titleFor = () => {
+    if (view === "farmerApp") return "Krishi Seva — Farmer";
+    if (view === "authorityApp") return `Krishi Seva — ${AUTHORITY_ROLES.find((r) => r.id === activeAuthorityRole)?.label || ""}`;
+    return "Krishi Seva";
+  };
+
+  return (
+    <div style={{ minHeight: "100dvh", background: COLOR.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif" }}>
+      <GlobalStyles />
+
+      {view === "farmerApp" ? (
+        <FarmerRole cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} embedded onSignOut={signOut} />
+      ) : (
+        <>
+          <MobileTopBar
+            title={titleFor()}
+            darkMode={darkMode} setDarkMode={setDarkMode}
+            onBack={view !== "public" && view !== "authorityApp" ? () => {
+              if (view === "roleChoice") setView("public");
+              else if (view === "farmerLogin") setView("roleChoice");
+              else if (view === "authorityRoleList") setView("roleChoice");
+              else if (view === "authorityLogin") setView("authorityRoleList");
+            } : undefined}
+            onSignIn={view === "public" ? () => setView("roleChoice") : undefined}
+            onSignOut={view === "authorityApp" ? signOut : undefined}
+          />
+
+          {view === "public" && <PublicRole cases={cases} alerts={alerts} advisories={advisories} />}
+          {view === "roleChoice" && <MobileRoleChoice onBack={() => setView("public")} onChoose={(choice) => setView(choice === "farmer" ? "farmerLogin" : "authorityRoleList")} />}
+          {view === "farmerLogin" && <MobileCredentialsForm role={{ id: "farmer", label: "Farmer", sub: "Report a problem, track cases", icon: "🌾" }} onBack={() => setView("roleChoice")} onSignIn={() => setView("farmerApp")} showToast={showToast} />}
+          {view === "authorityRoleList" && <MobileAuthorityRoleList onBack={() => setView("roleChoice")} onChoose={(r) => { setPendingRole(r); setView("authorityLogin"); }} />}
+          {view === "authorityLogin" && pendingRole && <MobileCredentialsForm role={pendingRole} onBack={() => setView("authorityRoleList")} onSignIn={() => { setActiveAuthorityRole(pendingRole.id); setView("authorityApp"); }} showToast={showToast} />}
+          {view === "authorityApp" && activeAuthorityRole && (
+            <MobileAuthorityRoleScreen
+              role={activeAuthorityRole} cases={cases} addCase={addCase} updateCase={updateCase}
+              alerts={alerts} updateAlert={updateAlert} advisories={advisories} setAdvisories={setAdvisories}
+              a11y={a11y} setA11y={setA11y} showToast={showToast}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -3403,9 +3418,9 @@ export default function App() {
       <div style={wrapperStyle}>
         <GlobalStyles />
         <MobileApp
-          cases={cases} addCase={addCase} updateCase={updateCase} alerts={alerts} advisories={advisories}
+          cases={cases} addCase={addCase} updateCase={updateCase} alerts={alerts} updateAlert={updateAlert}
+          advisories={advisories} setAdvisories={setAdvisories} a11y={a11y} setA11y={setA11y}
           darkMode={darkMode} setDarkMode={setDarkMode} showToast={showToast}
-          onViewDesktop={() => setForceDesktop(true)}
         />
         <GlobalToast msg={toast} />
       </div>
