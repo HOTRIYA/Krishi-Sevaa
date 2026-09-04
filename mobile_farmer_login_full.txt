@@ -1,0 +1,40 @@
+function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phase, setPhase] = useState("idle");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
+    setPhase("hashing");
+    await hashPassword(password);
+    setPhase("signing");
+    setTimeout(() => onSignIn(), 500);
+  };
+
+  return (
+    <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
+      <MobileGateHeader title="Sign in as Farmer" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div style={{ padding: "20px 18px 90px" }}>
+        <form onSubmit={submit}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 10 }}>
+            <div>
+              <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Email</div>
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="farmer@Krishi Seva.gov.in" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Password</div>
+              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+            </div>
+          </div>
+          <div style={{ fontSize: 10.5, color: COLOR.textMuted, marginBottom: 18 }}>🛡️ Password is hashed (SHA-256) in your browser before it's used.</div>
+          <PrimaryBtn disabled={phase !== "idle"}>{phase === "hashing" ? "Encrypting…" : phase === "signing" ? "Signing in…" : "Sign in"}</PrimaryBtn>
+          <div style={{ textAlign: "center", marginTop: 14 }}>
+            <button type="button" onClick={() => showToast("OTP would be sent to the registered number")} style={{ background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>Login with OTP</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+

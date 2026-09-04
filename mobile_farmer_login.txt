@@ -1,0 +1,19 @@
+function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phase, setPhase] = useState("idle");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
+    setPhase("hashing");
+    await hashPassword(password);
+    setPhase("signing");
+    setTimeout(() => onSignIn(), 500);
+  };
+
+  return (
+    <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
+      <MobileGateHeader title="Sign in as Farmer" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div style={{ padding: "20px 18px 90px" }}>
+        <form onSubmit={submit}>

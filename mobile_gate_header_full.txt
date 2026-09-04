@@ -1,0 +1,5 @@
+function MobileGateHeader({ title, onBack, darkMode, setDarkMode }) {
+  return (
+    <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+        <button onClick={onBack} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor

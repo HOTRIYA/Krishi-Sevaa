@@ -3295,14 +3295,60 @@ function RoleSwitcherBar({ activeRole, setActiveRole, loggedInRole, onSignOut, d
    desktop flow below.
    ============================================================ */
 
-function MobileGateHeader({ title, onBack, darkMode, setDarkMode }) {
+function LanguageTourBtn() {
+  const [showTour, setShowTour] = useState(true);
+
+  useEffect(() => {
+    if (!showTour) return;
+    const hide = () => setShowTour(false);
+    window.addEventListener("touchstart", hide, { capture: true, once: true });
+    window.addEventListener("mousedown", hide, { capture: true, once: true });
+    window.addEventListener("scroll", hide, { capture: true, once: true });
+    return () => {
+      window.removeEventListener("touchstart", hide, { capture: true });
+      window.removeEventListener("mousedown", hide, { capture: true });
+      window.removeEventListener("scroll", hide, { capture: true });
+    };
+  }, [showTour]);
+
   return (
-    <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+    <div style={{ position: "relative" }}>
+      <style>{`
+        @keyframes ksFloatTour {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+      `}</style>
+      <button style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "5px 10px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+        🌐 EN
+      </button>
+      {showTour && (
+        <div style={{ 
+          position: "absolute", top: "120%", right: 0, 
+          background: COLOR.blue, color: "#fff", padding: "10px 14px", 
+          borderRadius: 8, fontSize: 13, fontWeight: 600, width: 200, 
+          boxShadow: "0 8px 24px rgba(0,0,0,0.2)", zIndex: 1000,
+          animation: "ksFloatTour 2.5s infinite ease-in-out"
+        }}>
+          <div style={{ position: "absolute", top: -6, right: 15, width: 12, height: 12, background: COLOR.blue, transform: "rotate(45deg)" }}></div>
+          Change language from here
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileGateHeader({ title, onBack, darkMode, setDarkMode, rightExtra }) {
+  return (
+        <div style={{ background: COLOR.forest, color: "#fff", padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
         <button onClick={onBack} style={{ background: "none", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", padding: 0, width: 24 }}>←</button>
         <span style={{ fontSize: 15.5, fontWeight: 700 }}>{title}</span>
       </div>
-      <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {rightExtra}
+        <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
+      </div>
     </div>
   );
 }
@@ -3338,7 +3384,7 @@ function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode 
 
   return (
     <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
-      <MobileGateHeader title="Sign in as Farmer" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <MobileGateHeader title="Sign in as Farmer" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} rightExtra={<LanguageTourBtn />} />
       <div style={{ padding: "20px 18px 90px" }}>
         <form onSubmit={submit}>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 10 }}>
