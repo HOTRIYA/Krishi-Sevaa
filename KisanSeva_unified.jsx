@@ -1495,9 +1495,61 @@ function CallStateChip({ state }) {
   return <span style={{ fontSize: 12, fontWeight: 600, color: s.fg, background: s.bg, padding: "4px 10px", borderRadius: 20, display: "inline-flex", alignItems: "center", gap: 6 }}><span>{s.icon}</span>{s.label}</span>;
 }
 
+const IVR_SIM_STEPS = ["Language", "Category", "Speech", "Transcription", "Extraction", "Summary", "PIN", "Movement", "Routing"];
+const IVR_SIM_STEP_DETAILS = [
+  "Simulated farmer selects language: Hindi.",
+  "Simulated farmer selects category: Animal → Cow.",
+  "Simulated farmer speaks: “Meri gai do din se kuch nahi kha rahi.”",
+  "Speech converted to text by STT.",
+  "AI extracts symptoms, duration, and water intake.",
+  "AI generates a concise case summary.",
+  "Simulated farmer enters PIN: 302001.",
+  "Simulated farmer confirms recent livestock movement: Village A → Village B.",
+  "System finds the nearest available veterinary expert for routing.",
+];
+
+function IVRSimulatorPanel() {
+  const [stepIndex, setStepIndex] = useState(-1);
+  const running = stepIndex >= 0;
+  const start = () => setStepIndex(0);
+  const advance = () => setStepIndex((current) => Math.min(current + 1, IVR_SIM_STEPS.length - 1));
+  const reset = () => setStepIndex(-1);
+
+  return (
+    <Card title="IVR simulator" right={<Badge fg={COLOR.clay} bg={COLOR.clayTint}>DEMO / SIMULATION</Badge>}>
+      <p style={{ fontSize: 13, color: COLOR.textSecondary, margin: "0 0 16px", maxWidth: 620 }}>
+        Demonstrates the phone/IVR flow without placing a real call. For internal demo use only.
+      </p>
+      {!running ? (
+        <Button variant="primary" onClick={start} icon={Phone}>Start demo call</Button>
+      ) : (
+        <>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+            {IVR_SIM_STEPS.map((label, i) => (
+              <div key={label} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, padding: "6px 12px", borderRadius: 20, color: i < stepIndex ? COLOR.forest : i === stepIndex ? COLOR.blue : COLOR.textMuted, background: i < stepIndex ? COLOR.forestTint : i === stepIndex ? COLOR.blueTint : COLOR.surfaceSunken }}>
+                <span>{i < stepIndex ? "✓" : i === stepIndex ? "●" : "○"}</span>{label}
+              </div>
+            ))}
+          </div>
+          <div style={{ background: COLOR.surfaceSunken, borderRadius: 8, padding: 16, marginBottom: 16, minHeight: 80 }}>
+            <div style={{ fontSize: 11, color: COLOR.textMuted, marginBottom: 6, fontWeight: 700 }}>CURRENT STEP: {IVR_SIM_STEPS[stepIndex]}</div>
+            <div style={{ fontSize: 13.5, color: COLOR.text }}>{IVR_SIM_STEP_DETAILS[stepIndex]}</div>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Button variant="primary" onClick={advance} disabled={stepIndex >= IVR_SIM_STEPS.length - 1}>
+              {stepIndex >= IVR_SIM_STEPS.length - 1 ? "Simulation complete" : "Next step"}
+            </Button>
+            <Button variant="ghost" onClick={reset}>Reset</Button>
+          </div>
+        </>
+      )}
+    </Card>
+  );
+}
+
 function LiveCallsPage({ calls, onOpen }) {
   const [filter, setFilter] = useState("all");
-  const filters = [{ id: "all", label: "All" }, { id: "ai_collecting", label: "AI conversation" }, { id: "waiting_for_expert", label: "Waiting for expert" }, { id: "expert_connected", label: "Connected" }];
+  const filters = [{ id: "all", label: "All" }, { id: "ai_collecting", label: "AI conversation" }, { id: "waiting_for_expert", label: "Waiting for expert" }, { id: "expert_connected", label: "Connected" }, { id: "ivr_simulator", label: "IVR simulator" }];
   const visible = calls.filter((c) => filter === "all" || c.callState === filter);
   return (
     <div>
@@ -1509,6 +1561,8 @@ function LiveCallsPage({ calls, onOpen }) {
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {filters.map((f) => <button key={f.id} onClick={() => setFilter(f.id)} style={{ padding: "7px 14px", borderRadius: 20, fontSize: 12.5, fontWeight: 600, cursor: "pointer", border: `1px solid ${filter === f.id ? COLOR.forest : COLOR.border}`, background: filter === f.id ? COLOR.forest : COLOR.surface, color: filter === f.id ? "#fff" : COLOR.textSecondary }}>{f.label}</button>)}
       </div>
+      {filter === "ivr_simulator" && <IVRSimulatorPanel />}
+      {filter !== "ivr_simulator" && (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
         {visible.map((c) => (
           <div key={c.id} onClick={() => onOpen(c.id)} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 10, padding: 16, cursor: "pointer" }}>
@@ -1524,6 +1578,7 @@ function LiveCallsPage({ calls, onOpen }) {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }
