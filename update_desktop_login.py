@@ -40,7 +40,7 @@ new_login_screen = """function LoginScreen({ onSignIn, onViewPublic, showToast, 
       <div style={{ flex: 1, background: COLOR.forest, color: "#fff", padding: 48, display: "flex", flexDirection: "column", justifyContent: "center", minWidth: 320 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 30 }}>
           <div style={{ width: 34, height: 34, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>K</div>
-          <span style={{ fontSize: 17, fontWeight: 700 }}>Krishi Seva</span>
+          <span style={{ fontSize: 17, fontWeight: 700 }}>Krishi Sevak</span>
         </div>
         <h1 style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.25, margin: "0 0 14px", maxWidth: 380 }}>From farmer reports to early warning.</h1>
         <p style={{ fontSize: 14.5, color: "rgba(255,255,255,0.8)", maxWidth: 380, lineHeight: 1.6 }}>Helping veterinary teams respond faster to livestock health risks, while turning every report into useful public-health intelligence.</p>
@@ -97,7 +97,7 @@ new_login_screen = """function LoginScreen({ onSignIn, onViewPublic, showToast, 
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 8 }}>
                 <div>
                   <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Email</div>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={`${role.id}@Krishi Seva.gov.in`} style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: `1px solid ${COLOR.border}`, fontSize: 13.5 }} />
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={`${role.id}@Krishi Sevak.gov.in`} style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: `1px solid ${COLOR.border}`, fontSize: 13.5 }} />
                 </div>
                 <div>
                   <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Password</div>
@@ -126,7 +126,7 @@ new_role_switcher = """function RoleSwitcherBar({ activeRole, setActiveRole, onS
       <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ width: 26, height: 26, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12 }}>K</div>
-          <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+          <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Sevak</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
@@ -140,7 +140,7 @@ new_role_switcher = """function RoleSwitcherBar({ activeRole, setActiveRole, onS
     <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ width: 26, height: 26, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12 }}>K</div>
-        <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+        <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Sevak</span>
         <span style={{ display: "inline-flex", alignItems: "center", fontSize: 10, fontWeight: 700, color: COLOR.clay, background: COLOR.clayTint, padding: "2px 7px", borderRadius: 12, marginLeft: 4 }}>DEMO</span>
       </div>
       <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>

@@ -783,7 +783,7 @@ const FARMER_I18N = {
   "Location received": { hi: "स्थान प्राप्त हुआ", mr: "स्थान प्राप्त झाले" },
   "Approximate location captured": { hi: "अनुमानित स्थान दर्ज किया गया", mr: "अंदाजे स्थान नोंदवले गेले" },
   "📍 Getting your location…": { hi: "📍 आपका स्थान प्राप्त किया जा रहा है…", mr: "📍 तुमचे स्थान मिळवले जात आहे…" },
-  "Krishi Seva would like to use your location to find the right veterinary authority.": { hi: "Krishi Seva सही पशु चिकित्सा प्राधिकरण खोजने के लिए आपके स्थान का उपयोग करना चाहता है।", mr: "योग्य पशुवैद्यकीय प्राधिकरण शोधण्यासाठी Krishi Seva ला तुमचे स्थान वापरायचे आहे." },
+  "Krishi Sevak would like to use your location to find the right veterinary authority.": { hi: "Krishi Sevak सही पशु चिकित्सा प्राधिकरण खोजने के लिए आपके स्थान का उपयोग करना चाहता है।", mr: "योग्य पशुवैद्यकीय प्राधिकरण शोधण्यासाठी Krishi Sevak ला तुमचे स्थान वापरायचे आहे." },
   "Allow": { hi: "अनुमति दें", mr: "परवानगी द्या" },
   "Not now": { hi: "अभी नहीं", mr: "आत्ता नाही" },
   "📍 Share location": { hi: "📍 स्थान साझा करें", mr: "📍 स्थान शेअर करा" },
@@ -1122,7 +1122,7 @@ function FarmerStepLocation({ data, set, lang }) {
         <div style={{ textAlign: "center", padding: "20px 0", color: COLOR.textSecondary, fontSize: 13.5 }}>{ft("📍 Getting your location…", lang)}</div>
       ) : asking ? (
         <div style={{ background: COLOR.blueTint, borderRadius: 12, padding: 16 }}>
-          <div style={{ fontSize: 13.5, color: COLOR.text, marginBottom: 14 }}>{ft("Krishi Seva would like to use your location to find the right veterinary authority.", lang)}</div>
+          <div style={{ fontSize: 13.5, color: COLOR.text, marginBottom: 14 }}>{ft("Krishi Sevak would like to use your location to find the right veterinary authority.", lang)}</div>
           <div style={{ display: "flex", gap: 10 }}><PrimaryBtn full={false} onClick={grantPermission}>{ft("Allow", lang)}</PrimaryBtn><GhostBtn full={false} onClick={() => setAsking(false)}>{ft("Not now", lang)}</GhostBtn></div>
         </div>
       ) : (
@@ -1134,10 +1134,6 @@ function FarmerStepLocation({ data, set, lang }) {
           <input value={data.pin} onChange={(e) => set({ pin: e.target.value.replace(/\D/g, "").slice(0, 6), locationMethod: "pin" })} placeholder={ft("Enter PIN code", lang)} inputMode="numeric" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1.5px solid ${COLOR.border}`, fontSize: 14 }} />
         </div>
       )}
-      <div style={{ marginTop: 24, background: COLOR.surfaceSunken, borderRadius: 12, padding: 14 }}>
-        <div style={{ fontSize: 12.5, fontWeight: 700, color: COLOR.text, marginBottom: 4 }}>{ft("📲 Don't have a smartphone?", lang)}</div>
-        <div style={{ fontSize: 12, color: COLOR.textSecondary }}>{ft("Call our helpline and follow the voice instructions: Call → Answer questions → Enter PIN → Get expert assistance.", lang)}</div>
-      </div>
     </div>
   );
 }
@@ -1462,7 +1458,7 @@ function FarmerRole({ cases, addCase, updateCase, advisories, embedded, onSignOu
         <div style={{ background: COLOR.surface, borderBottom: `1px solid ${COLOR.border}`, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 24, height: 24, borderRadius: 6, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11 }}>K</div>
-            <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+            <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Sevak</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <LanguageTourWrapper lang={lang}>
@@ -2691,7 +2687,7 @@ function CreateAdvisoryModal({ onClose, onSubmit }) {
     return (
       <Modal title="Preview advisory" onClose={onClose}>
         <div style={{ background: COLOR.surfaceSunken, borderRadius: 10, padding: 14, marginBottom: 16 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.forest, marginBottom: 6 }}>📱 Krishi Seva</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: COLOR.forest, marginBottom: 6 }}>📱 Krishi Sevak</div>
           <div style={{ fontSize: 14, lineHeight: 1.7 }}>{message}</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", marginBottom: 16 }}><Field label="Target" value={area} /><Field label="Language" value={language} /></div>
@@ -3152,7 +3148,7 @@ function PublicHeader({ onSignInClick, darkMode, setDarkMode }) {
     <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
         <div style={{ width: 28, height: 28, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13 }}>K</div>
-        <span style={{ fontSize: 14.5, fontWeight: 700 }}>Krishi Seva</span>
+        <span style={{ fontSize: 14.5, fontWeight: 700 }}>Krishi Sevak</span>
         <Badge fg={COLOR.blue} bg={COLOR.blueTint}>Public Dashboard</Badge>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -3356,7 +3352,7 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
       <div style={{ flex: 1, background: COLOR.forest, color: "#fff", padding: 48, display: "flex", flexDirection: "column", justifyContent: "center", minWidth: 320 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 30 }}>
           <div style={{ width: 34, height: 34, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>K</div>
-          <span style={{ fontSize: 17, fontWeight: 700 }}>Krishi Seva</span>
+          <span style={{ fontSize: 17, fontWeight: 700 }}>Krishi Sevak</span>
         </div>
         <h1 style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.25, margin: "0 0 14px", maxWidth: 380 }}>From farmer reports to early warning.</h1>
         <p style={{ fontSize: 14.5, color: "rgba(255,255,255,0.8)", maxWidth: 380, lineHeight: 1.6 }}>Helping veterinary teams respond faster to livestock health risks, while turning every report into useful public-health intelligence.</p>
@@ -3416,7 +3412,7 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 8 }}>
                 <div>
                   <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Email</div>
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={`${role.id}@Krishi Seva.gov.in`} style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: `1px solid ${COLOR.border}`, fontSize: 13.5 }} />
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={`${role.id}@Krishi Sevak.gov.in`} style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, border: `1px solid ${COLOR.border}`, fontSize: 13.5 }} />
                 </div>
                 <div>
                   <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Password</div>
@@ -3445,7 +3441,7 @@ function RoleSwitcherBar({ activeRole, setActiveRole, loggedInRole, onSignOut, d
       <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ width: 26, height: 26, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12 }}>K</div>
-          <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+          <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Sevak</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
@@ -3459,7 +3455,7 @@ function RoleSwitcherBar({ activeRole, setActiveRole, loggedInRole, onSignOut, d
     <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ width: 26, height: 26, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12 }}>K</div>
-        <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+        <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Sevak</span>
         <span style={{ display: "inline-flex", alignItems: "center", fontSize: 10, fontWeight: 700, color: COLOR.clay, background: COLOR.clayTint, padding: "2px 7px", borderRadius: 12, marginLeft: 4 }}>DEMO</span>
       </div>
       <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -3586,7 +3582,7 @@ function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode 
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 10 }}>
             <div>
               <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Email</div>
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="farmer@Krishi Seva.gov.in" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="farmer@Krishi Sevak.gov.in" style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 10, border: `1px solid ${COLOR.border}`, fontSize: 14 }} />
             </div>
             <div>
               <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginBottom: 5 }}>Password</div>
