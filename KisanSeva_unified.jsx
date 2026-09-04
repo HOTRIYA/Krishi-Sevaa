@@ -1782,13 +1782,15 @@ function ExpertOverview({ cases, onOpen, onAccept }) {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12, marginBottom: 18 }}>
-        {EXPERT_KPIS.map((k) => { const t = TONE_MAP[k.tone]; return (
-          <div key={k.label} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 12, padding: 15 }}>
-            <div style={{ width: 26, height: 26, borderRadius: 7, background: t.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}><k.icon size={13} color={t.fg} /></div>
-            <div style={{ fontSize: 21, fontWeight: 700 }}>{k.value}</div><div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{k.label}</div>
-            {k.delta && <div style={{ fontSize: 11, fontWeight: 600, color: t.fg, marginTop: 4 }}>{k.delta}</div>}
-          </div>
-        ); })}
+        {EXPERT_KPIS.map((k) => {
+          const t = TONE_MAP[k.tone]; return (
+            <div key={k.label} style={{ background: COLOR.surface, border: `1px solid ${COLOR.border}`, borderRadius: 12, padding: 15 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 7, background: t.bg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}><k.icon size={13} color={t.fg} /></div>
+              <div style={{ fontSize: 21, fontWeight: 700 }}>{k.value}</div><div style={{ fontSize: 12, color: COLOR.textSecondary, marginTop: 2 }}>{k.label}</div>
+              {k.delta && <div style={{ fontSize: 11, fontWeight: 600, color: t.fg, marginTop: 4 }}>{k.delta}</div>}
+            </div>
+          );
+        })}
       </div>
       {clusterCase && (
         <div style={{ display: "flex", alignItems: "center", gap: 12, background: COLOR.redTint, border: `1px solid ${COLOR.red}22`, borderRadius: 12, padding: "12px 16px", marginBottom: 18 }}>
@@ -2207,15 +2209,17 @@ function SurvAlertDetail({ alert: a, onBack, onUpdate, showToast }) {
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", margin: "22px 0" }}>
-        {SURV_STEPS.map((s, i) => { const idx = survStepIndex(a); return (
-          <React.Fragment key={s}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minWidth: 0 }}>
-              <div style={{ width: 20, height: 20, borderRadius: "50%", background: i <= idx ? COLOR.forest : COLOR.surfaceSunken, color: i <= idx ? "#fff" : COLOR.textMuted, fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i < idx ? "✓" : i + 1}</div>
-              <span style={{ fontSize: 10, textAlign: "center", color: i <= idx ? COLOR.text : COLOR.textMuted, maxWidth: 76 }}>{s}</span>
-            </div>
-            {i < SURV_STEPS.length - 1 && <div style={{ flex: 1, height: 1.5, background: i < idx ? COLOR.forest : COLOR.border, marginBottom: 16 }} />}
-          </React.Fragment>
-        ); })}
+        {SURV_STEPS.map((s, i) => {
+          const idx = survStepIndex(a); return (
+            <React.Fragment key={s}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, minWidth: 0 }}>
+                <div style={{ width: 20, height: 20, borderRadius: "50%", background: i <= idx ? COLOR.forest : COLOR.surfaceSunken, color: i <= idx ? "#fff" : COLOR.textMuted, fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{i < idx ? "✓" : i + 1}</div>
+                <span style={{ fontSize: 10, textAlign: "center", color: i <= idx ? COLOR.text : COLOR.textMuted, maxWidth: 76 }}>{s}</span>
+              </div>
+              {i < SURV_STEPS.length - 1 && <div style={{ flex: 1, height: 1.5, background: i < idx ? COLOR.forest : COLOR.border, marginBottom: 16 }} />}
+            </React.Fragment>
+          );
+        })}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         <div>
@@ -2667,7 +2671,7 @@ function AdminRulesPage({ showToast }) {
       {adding && (
         <Modal title="Add rule" onClose={() => setAdding(false)}>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <LabeledInput label="Rule name" placeholder="e.g. Fever + reduced appetite" value="" onChange={() => {}} />
+            <LabeledInput label="Rule name" placeholder="e.g. Fever + reduced appetite" value="" onChange={() => { }} />
             <div style={{ background: COLOR.surfaceSunken, borderRadius: 8, padding: 12, fontSize: 12.5 }}>
               <div style={{ fontWeight: 700, marginBottom: 6 }}>IF</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}><select style={{ padding: "6px 8px", borderRadius: 6, border: `1px solid ${COLOR.border}`, fontSize: 12.5 }}><option>Symptom = Fever</option></select><span style={{ color: COLOR.textMuted, alignSelf: "center" }}>AND</span><select style={{ padding: "6px 8px", borderRadius: 6, border: `1px solid ${COLOR.border}`, fontSize: 12.5 }}><option>Duration &gt; 48h</option></select></div>
@@ -2944,39 +2948,6 @@ function PublicHeader({ onSignInClick, darkMode, setDarkMode }) {
   );
 }
 
-// Mobile now gets the SAME top bar the desktop "Public" tab uses (logo, DEMO
-// badge, full role tab row, Public highlighted) instead of the older, plainer
-// PublicHeader. Tapping "Public" does nothing (you're already there). Tapping
-// any other role tab reuses the existing mobile sign-in gate: Farmer goes
-// straight to the farmer login screen, every other (desktop-only) role shows
-// the "you need a laptop/PC" screen with a "Start desktop mode" option — same
-// behaviour as before, just reachable from a tab that looks like the desktop one.
-function MobilePublicTopBar({ setMobileGate, darkMode, setDarkMode }) {
-  const chooseRole = (id) => setMobileGate(id === "farmer" ? "farmerLogin" : "authorityBlocked");
-  return (
-    <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 26, height: 26, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12 }}>K</div>
-        <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
-        <span style={{ display: "inline-flex", alignItems: "center", fontSize: 10, fontWeight: 700, color: COLOR.clay, background: COLOR.clayTint, padding: "2px 7px", borderRadius: 12, marginLeft: 4 }}>DEMO</span>
-      </div>
-      <div style={{ display: "flex", gap: 4, flexWrap: "nowrap", overflowX: "auto", WebkitOverflowScrolling: "touch", maxWidth: "100%" }}>
-        {ROLES.map((r) => (
-          <button key={r.id} onClick={() => chooseRole(r.id)} title={r.sub} className="ks-btn ks-tab-btn" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 11px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 12.5, fontWeight: 500, background: "transparent", color: COLOR.textSecondary, whiteSpace: "nowrap", flex: "none" }}>
-            <span>{r.icon}</span>{r.label}
-          </button>
-        ))}
-        <button title="Public, read-only dashboard" className="ks-btn ks-tab-btn" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 11px", borderRadius: 7, border: `1px dashed ${COLOR.forest}`, cursor: "default", fontSize: 12.5, fontWeight: 700, background: COLOR.forestTint, color: COLOR.forest, whiteSpace: "nowrap", flex: "none" }}>
-          <span>🌐</span>Public
-        </button>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
-      </div>
-    </div>
-  );
-}
-
 function PublicRole({ cases, alerts, advisories }) {
   const [block, setBlock] = useState("Sanganer");
   const [range, setRange] = useState("7 days");
@@ -3131,12 +3102,23 @@ async function hashPassword(pw) {
 }
 
 function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode }) {
-  const [step, setStep] = useState("role");
+  // step: "groupChoice" | "authorityRoleChoice" | "credentials"
+  const [step, setStep] = useState("groupChoice");
   const [role, setRole] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phase, setPhase] = useState("idle");
   const [hashPreview, setHashPreview] = useState("");
+
+  const chooseGroup = (group) => {
+    if (group === "farmer") {
+      const farmerRole = ROLES.find(r => r.id === "farmer");
+      setRole(farmerRole);
+      setStep("credentials");
+    } else {
+      setStep("authorityRoleChoice");
+    }
+  };
 
   const chooseRole = (r) => { setRole(r); setStep("credentials"); };
 
@@ -3172,24 +3154,46 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
 
       <div style={{ flex: 1.2, display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}>
         <div style={{ width: "100%", maxWidth: 420 }}>
-          {step === "role" ? (
+          {step === "groupChoice" ? (
             <>
               <h2 style={{ fontSize: 19, fontWeight: 700, marginBottom: 6 }}>Sign in</h2>
-              <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Choose your role to continue.</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
-                {ROLES.map((r) => (
-                  <button key={r.id} onClick={() => chooseRole(r)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px", borderRadius: 10, border: `1px solid ${COLOR.border}`, background: COLOR.surface, cursor: "pointer", textAlign: "left" }}>
-                    <span style={{ fontSize: 18 }}>{r.icon}</span>
-                    <span><div style={{ fontSize: 12.5, fontWeight: 700, color: COLOR.text }}>{r.label}</div><div style={{ fontSize: 10.5, color: COLOR.textMuted }}>{r.sub}</div></span>
-                  </button>
-                ))}
+              <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Are you signing in as a farmer, or as an authority-side user?</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
+                <BigButton icon="🌾" title="Farmer login" subtitle="Report a problem, track your cases" onClick={() => chooseGroup("farmer")} />
+                <BigButton icon="🏛️" title="Authority login" subtitle="Call console, authority, expert, surveillance or admin" variant="secondary" onClick={() => chooseGroup("authority")} />
               </div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 10.5, fontWeight: 700, color: COLOR.clay, background: COLOR.clayTint, padding: "3px 9px", borderRadius: 16 }}>DEMO MODE</div>
-              <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 6 }}>You can switch between roles after signing in.</div>
+            </>
+          ) : step === "authorityRoleChoice" ? (
+            <>
+              <button type="button" onClick={() => setStep("groupChoice")} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>← Back</button>
+              <h2 style={{ fontSize: 19, fontWeight: 700, marginBottom: 6 }}>Authority Access</h2>
+              <div style={{ fontSize: 12.5, color: COLOR.textSecondary, marginBottom: 16 }}>Choose your specific authority role.</div>
+
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: COLOR.surfaceSunken, padding: "12px 16px", borderRadius: 10, border: `1px solid ${COLOR.border}`, marginBottom: 12 }}>
+                <span style={{ fontSize: 20 }}>👉</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.text }}>Login as Admin for full access</div>
+                  <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 4 }}>(suggested for prototype version)</div>
+                  <div style={{ fontSize: 11.5, color: COLOR.red, marginTop: 4 }}>This highlight and access will be removed when launched at full scale</div>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
+                {ROLES.filter(r => r.id !== "farmer").sort((a, b) => a.id === "admin" ? -1 : b.id === "admin" ? 1 : 0).map((r) => {
+                  const isAdmin = r.id === "admin";
+                  return (
+                    <button key={r.id} onClick={() => chooseRole(r)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px", borderRadius: 10, border: isAdmin ? `2px solid ${COLOR.red}` : `1px solid ${COLOR.border}`, background: isAdmin ? COLOR.redTint : COLOR.surface, cursor: "pointer", textAlign: "left", position: "relative", gridColumn: isAdmin ? "1 / -1" : "auto" }}>
+                      <span style={{ fontSize: 18 }}>{r.icon}</span>
+                      <span><div style={{ fontSize: 12.5, fontWeight: 700, color: isAdmin ? COLOR.red : COLOR.text }}>{r.label}</div><div style={{ fontSize: 10.5, color: COLOR.textMuted }}>{r.sub}</div></span>
+                    </button>
+                  );
+                })}
+              </div>
             </>
           ) : (
             <form onSubmit={submit}>
-              <button type="button" onClick={() => { setStep("role"); setPhase("idle"); }} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>← Change role</button>
+              <button type="button" onClick={() => { setStep(role.id === "farmer" ? "groupChoice" : "authorityRoleChoice"); setPhase("idle"); }} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: COLOR.forest, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>← Change role</button>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
                 <span style={{ fontSize: 24 }}>{role.icon}</span>
                 <div><div style={{ fontSize: 17, fontWeight: 700 }}>Sign in as {role.label}</div><div style={{ fontSize: 11.5, color: COLOR.textMuted }}>{role.sub}</div></div>
@@ -3220,7 +3224,22 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
   );
 }
 
-function RoleSwitcherBar({ activeRole, setActiveRole, onSignOut, darkMode, setDarkMode }) {
+function RoleSwitcherBar({ activeRole, setActiveRole, loggedInRole, onSignOut, darkMode, setDarkMode }) {
+  if (loggedInRole !== "admin") {
+    return (
+      <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 26, height: 26, borderRadius: 7, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12 }}>K</div>
+          <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} small />
+          <button onClick={onSignOut} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: `1px solid ${COLOR.border}`, borderRadius: 7, padding: "6px 11px", cursor: "pointer", fontSize: 12, color: COLOR.textSecondary }}><LogOut size={12} /> Sign out</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -3327,6 +3346,7 @@ function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode 
 }
 
 function MobileAuthorityBlocked({ onBack, onStartDesktop, darkMode, setDarkMode }) {
+  const [showDesktopAlert, setShowDesktopAlert] = useState(false);
   return (
     <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
       <MobileGateHeader title="Authority login" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
@@ -3336,17 +3356,30 @@ function MobileAuthorityBlocked({ onBack, onStartDesktop, darkMode, setDarkMode 
           <div style={{ fontSize: 15, fontWeight: 700, color: COLOR.text, marginBottom: 6 }}>Sorry, you need a laptop or PC for authority access</div>
           <div style={{ fontSize: 13, color: COLOR.textSecondary, lineHeight: 1.6 }}>The Call Console, Authority, Expert, Surveillance and Admin workspaces are built for larger screens. You can still use them from this phone by switching to desktop mode below.</div>
         </div>
-        <PrimaryBtn onClick={onStartDesktop}><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Monitor size={16} /> Start desktop mode</span></PrimaryBtn>
+        <PrimaryBtn onClick={() => setShowDesktopAlert(true)}><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Monitor size={16} /> Start desktop mode</span></PrimaryBtn>
         <div style={{ textAlign: "center", marginTop: 14 }}>
           <button type="button" onClick={onBack} style={{ background: "none", border: "none", color: COLOR.textSecondary, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>← Go back</button>
         </div>
       </div>
+      {showDesktopAlert && (
+        <Modal title="Switch to Desktop Mode" onClose={() => setShowDesktopAlert(false)}>
+          <div style={{ fontSize: 13, color: COLOR.text, lineHeight: 1.6 }}>
+            <div style={{ marginBottom: 12 }}>To view the authority dashboards on your phone, you must manually enable "Desktop site" in your mobile browser.</div>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>For Chrome / Android:</div>
+            <div style={{ marginBottom: 12, color: COLOR.textSecondary }}>Tap the three dots (<span style={{ fontWeight: 700 }}>⋮</span>) in the top right corner and check the box for <span style={{ fontWeight: 700 }}>"Desktop site"</span>.</div>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>For Safari / iOS:</div>
+            <div style={{ marginBottom: 16, color: COLOR.textSecondary }}>Tap the <span style={{ fontWeight: 700 }}>"aA"</span> icon in the address bar and select <span style={{ fontWeight: 700 }}>"Request Desktop Website"</span>.</div>
+            <PrimaryBtn onClick={() => { setShowDesktopAlert(false); onStartDesktop(); }}>I've done it, continue</PrimaryBtn>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
 
 export default function App() {
   const [authed, setAuthed] = useState(false);
+  const [loggedInRole, setLoggedInRole] = useState(null);
   // Public dashboard is the default landing view for everyone, mobile and desktop alike — no login prompt up front.
   const [publicMode, setPublicMode] = useState(true);
   const [activeRole, setActiveRole] = useState("authority");
@@ -3358,20 +3391,6 @@ export default function App() {
   // Sub-stage of the lightweight mobile sign-in gate: null | "choice" | "farmerLogin" | "authorityBlocked"
   const [mobileGate, setMobileGate] = useState(null);
 
-  // Make sure pinch-to-zoom is always available on phones, no matter what the
-  // page's own <meta name="viewport"> happens to say (some hosting templates
-  // ship with user-scalable=no / maximum-scale=1, which silently disables it).
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    let tag = document.querySelector('meta[name="viewport"]');
-    if (!tag) {
-      tag = document.createElement("meta");
-      tag.name = "viewport";
-      document.head.appendChild(tag);
-    }
-    tag.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes");
-  }, []);
-
   const [cases, setCases] = useState(INITIAL_CASES);
   const [alerts, setAlerts] = useState(INITIAL_ALERTS);
   const [advisories, setAdvisories] = useState(ADVISORIES_INIT);
@@ -3381,8 +3400,8 @@ export default function App() {
   const updateCase = (id, patch) => setCases((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   const updateAlert = (id, patch) => setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
 
-  const signIn = (role) => { setAuthed(true); setPublicMode(false); setActiveRole(role); };
-  const signOut = () => { setAuthed(false); setActiveRole("authority"); setPublicMode(true); setMobileGate(null); };
+  const signIn = (role) => { setAuthed(true); setPublicMode(false); setActiveRole(role); setLoggedInRole(role); };
+  const signOut = () => { setAuthed(false); setActiveRole("authority"); setLoggedInRole(null); setPublicMode(true); setMobileGate(null); };
 
   const wrapperStyle = {
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif",
@@ -3418,7 +3437,7 @@ export default function App() {
     return (
       <div style={wrapperStyle}>
         <GlobalStyles />
-        <MobilePublicTopBar setMobileGate={setMobileGate} darkMode={darkMode} setDarkMode={setDarkMode} />
+        <PublicHeader onSignInClick={() => setMobileGate("choice")} darkMode={darkMode} setDarkMode={setDarkMode} />
         <PublicRole cases={cases} alerts={alerts} advisories={advisories} />
         <GlobalToast msg={toast} />
       </div>
@@ -3442,7 +3461,7 @@ export default function App() {
   return (
     <div style={wrapperStyle}>
       <GlobalStyles />
-      <RoleSwitcherBar activeRole={activeRole} setActiveRole={setActiveRole} onSignOut={signOut} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <RoleSwitcherBar activeRole={activeRole} setActiveRole={setActiveRole} loggedInRole={loggedInRole} onSignOut={signOut} darkMode={darkMode} setDarkMode={setDarkMode} />
 
       {activeRole === "public" && <PublicRole cases={cases} alerts={alerts} advisories={advisories} />}
       {activeRole === "farmer" && <FarmerRole cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} />}
