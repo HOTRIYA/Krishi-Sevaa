@@ -3217,8 +3217,8 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
   );
 }
 
-function RoleSwitcherBar({ activeRole, setActiveRole, onSignOut, darkMode, setDarkMode }) {
-  if (activeRole !== "admin") {
+function RoleSwitcherBar({ activeRole, setActiveRole, loggedInRole, onSignOut, darkMode, setDarkMode }) {
+  if (loggedInRole !== "admin") {
     return (
       <div style={{ borderBottom: `1px solid ${COLOR.border}`, background: COLOR.surface, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -3359,6 +3359,7 @@ function MobileAuthorityBlocked({ onBack, onStartDesktop, darkMode, setDarkMode 
 
 export default function App() {
   const [authed, setAuthed] = useState(false);
+  const [loggedInRole, setLoggedInRole] = useState(null);
   // Public dashboard is the default landing view for everyone, mobile and desktop alike — no login prompt up front.
   const [publicMode, setPublicMode] = useState(true);
   const [activeRole, setActiveRole] = useState("authority");
@@ -3379,8 +3380,8 @@ export default function App() {
   const updateCase = (id, patch) => setCases((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   const updateAlert = (id, patch) => setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
 
-  const signIn = (role) => { setAuthed(true); setPublicMode(false); setActiveRole(role); };
-  const signOut = () => { setAuthed(false); setActiveRole("authority"); setPublicMode(true); setMobileGate(null); };
+  const signIn = (role) => { setAuthed(true); setPublicMode(false); setActiveRole(role); setLoggedInRole(role); };
+  const signOut = () => { setAuthed(false); setActiveRole("authority"); setLoggedInRole(null); setPublicMode(true); setMobileGate(null); };
 
   const wrapperStyle = {
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif",
@@ -3440,7 +3441,7 @@ export default function App() {
   return (
     <div style={wrapperStyle}>
       <GlobalStyles />
-      <RoleSwitcherBar activeRole={activeRole} setActiveRole={setActiveRole} onSignOut={signOut} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <RoleSwitcherBar activeRole={activeRole} setActiveRole={setActiveRole} loggedInRole={loggedInRole} onSignOut={signOut} darkMode={darkMode} setDarkMode={setDarkMode} />
 
       {activeRole === "public" && <PublicRole cases={cases} alerts={alerts} advisories={advisories} />}
       {activeRole === "farmer" && <FarmerRole cases={cases} addCase={addCase} updateCase={updateCase} advisories={advisories} />}
