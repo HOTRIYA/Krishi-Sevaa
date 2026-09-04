@@ -59,20 +59,22 @@ const SOURCE_TONE = {
 
 /* ---------------- Mobile detection + dark theme (additive only) ---------------- */
 
-function DesktopViewportForcer() {
+function DesktopScaleWrapper({ children }) {
+  const [scale, setScale] = useState(1);
   useEffect(() => {
-    const meta = document.querySelector('meta[name="viewport"]');
-    const originalContent = meta ? meta.getAttribute('content') : "width=device-width, initial-scale=1.0";
-    if (meta) {
-      meta.setAttribute('content', 'width=1024, initial-scale=0.1, maximum-scale=10.0');
-    }
-    return () => {
-      if (meta) {
-        meta.setAttribute('content', originalContent);
-      }
+    const onResize = () => {
+      setScale(window.innerWidth < 1024 ? window.innerWidth / 1024 : 1);
     };
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
-  return null;
+
+  return (
+    <div style={{ zoom: scale, minWidth: 1024, overflowX: "hidden", minHeight: "100vh" }}>
+      {children}
+    </div>
+  );
 }
 
 function useIsMobile() {
@@ -3495,10 +3497,11 @@ export default function App() {
     }
     return (
       <div style={wrapperStyle}>
-        <DesktopViewportForcer />
-        <GlobalStyles />
-        <PublicHeader onSignInClick={() => setMobileGate("choice")} darkMode={darkMode} setDarkMode={setDarkMode} />
-        <PublicRole cases={cases} alerts={alerts} advisories={advisories} />
+        <DesktopScaleWrapper>
+          <GlobalStyles />
+          <PublicHeader onSignInClick={() => setMobileGate("choice")} darkMode={darkMode} setDarkMode={setDarkMode} />
+          <PublicRole cases={cases} alerts={alerts} advisories={advisories} />
+        </DesktopScaleWrapper>
         <GlobalToast msg={toast} />
       </div>
     );
