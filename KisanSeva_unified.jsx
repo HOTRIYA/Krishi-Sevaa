@@ -1269,7 +1269,9 @@ function FarmerRole({ cases, addCase, updateCase, advisories, embedded, onSignOu
             <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <button onClick={() => setLang((l) => (l === "en" ? "hi" : "en"))} style={{ background: "none", border: "none", fontSize: 11.5, fontWeight: 700, color: COLOR.forest, cursor: "pointer" }}>{lang === "en" ? "हिन्दी" : "English"}</button>
+            <LanguageTourWrapper>
+              <button onClick={() => setLang((l) => (l === "en" ? "hi" : "en"))} style={{ background: "none", border: "none", fontSize: 11.5, fontWeight: 700, color: COLOR.forest, cursor: "pointer" }}>{lang === "en" ? "हिन्दी" : "English"}</button>
+            </LanguageTourWrapper>
             <button onClick={() => setConnectivity((c) => (c === "online" ? "offline" : "online"))} title="Demo: toggle connectivity" style={{ background: "none", border: "none", fontSize: 13, cursor: "pointer" }}>{connectivity === "online" ? "🟢" : "⚠️"}</button>
             {embedded && onSignOut && <button onClick={onSignOut} title="Sign out" style={{ background: "none", border: "none", fontSize: 13, cursor: "pointer", color: COLOR.textSecondary, display: "flex" }}><LogOut size={14} /></button>}
           </div>
@@ -3295,7 +3297,7 @@ function RoleSwitcherBar({ activeRole, setActiveRole, loggedInRole, onSignOut, d
    desktop flow below.
    ============================================================ */
 
-function LanguageTourBtn() {
+function LanguageTourWrapper({ children }) {
   const [showTour, setShowTour] = useState(true);
 
   useEffect(() => {
@@ -3312,16 +3314,14 @@ function LanguageTourBtn() {
   }, [showTour]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
       <style>{`
         @keyframes ksFloatTour {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-4px); }
         }
       `}</style>
-      <button style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "5px 10px", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-        🌐 EN
-      </button>
+      {children}
       {showTour && (
         <div style={{ 
           position: "absolute", top: "120%", right: 0, 
@@ -3384,7 +3384,7 @@ function MobileFarmerLogin({ onBack, onSignIn, showToast, darkMode, setDarkMode 
 
   return (
     <div style={{ minHeight: "100dvh", background: COLOR.bg }}>
-      <MobileGateHeader title="Sign in as Farmer" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} rightExtra={<LanguageTourBtn />} />
+      <MobileGateHeader title="Sign in as Farmer" onBack={onBack} darkMode={darkMode} setDarkMode={setDarkMode} />
       <div style={{ padding: "20px 18px 90px" }}>
         <form onSubmit={submit}>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 10 }}>

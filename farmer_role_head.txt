@@ -1,0 +1,32 @@
+[{ speaker: "farmer", text: data.description }] : [],
+      transcriptEdited: false,
+      movement: data.movement === "Yes" ? { reported: true, previous: data.moveFrom || "Unspecified", current: data.moveTo || "Unspecified", date: "Today", source: "Farmer reported", connection: "Not yet analyzed" } : { reported: false },
+      cluster: null,
+      history: [{ time: "Just now", label: "Farmer submitted report via PWA" }, { time: "Just now", label: "AI summary generated" }, { time: "Just now", label: `Risk assessed: ${risk}` }, { time: "Just now", label: available ? "Expert assigned, Dr. Sharma" : "Callback requested" }],
+      labReferral: null, expertAssessment: null, callback: available ? null : { requestedAt: "Just now", preferred: "As soon as possible" }, resolution: null,
+    };
+    addCase(newCase);
+    setSubmission({ offline: false, caseId, available, expertName: "Dr. Sharma, Veterinary Officer", expertArea: "Sanganer" });
+    setScreen("result");
+  };
+
+  const nav = (id) => { setScreen(id); setOpenCaseId(null); };
+  const openCase = myCases.find((c) => c.id === openCaseId);
+
+  const frameStyle = embedded
+    ? { width: "100%", background: COLOR.bg, overflow: "hidden", position: "relative", height: "100dvh" }
+    : { width: 390, maxWidth: "100%", background: COLOR.bg, borderRadius: 30, border: "8px solid #2A2C26", boxShadow: "0 20px 50px rgba(0,0,0,0.25)", overflow: "hidden", position: "relative", height: 760, maxHeight: "88vh" };
+  const outerStyle = embedded
+    ? { minHeight: "100dvh", background: COLOR.bg }
+    : { minHeight: "100%", background: "#EDE7D6", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "28px 12px" };
+
+  return (
+    <div style={outerStyle}>
+      <div style={frameStyle}>
+        <div style={{ background: COLOR.surface, borderBottom: `1px solid ${COLOR.border}`, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 24, height: 24, borderRadius: 6, background: COLOR.forest, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11 }}>K</div>
+            <span style={{ fontSize: 13.5, fontWeight: 700 }}>Krishi Seva</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button onClick={() => setLang((l) => (l === "en" ? "hi" : "en"))} style={{ bac
