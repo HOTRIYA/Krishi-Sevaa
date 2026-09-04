@@ -3175,7 +3175,7 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: COLOR.text }}>Login as Admin for full access</div>
                   <div style={{ fontSize: 11.5, color: COLOR.textMuted, marginTop: 4 }}>(suggested for prototype version)</div>
-                  <div style={{ fontSize: 11.5, color: COLOR.red, marginTop: 4 }}>(This highlight and access will be removed when launched at full scale)</div>
+                  <div style={{ fontSize: 11.5, color: COLOR.red, marginTop: 4 }}>This highlight and access will be removed when launched at full scale</div>
                 </div>
               </div>
 
