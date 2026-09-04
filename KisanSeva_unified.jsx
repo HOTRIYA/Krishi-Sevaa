@@ -3092,7 +3092,7 @@ function LoginScreen({ onSignIn, onViewPublic, showToast, darkMode, setDarkMode 
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: COLOR.bg, display: "flex", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif", position: "relative" }}>
+    <div style={{ minHeight: "100vh", background: COLOR.bg, display: "flex", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif", position: "relative", filter: themeFilter(darkMode, false) }}>
       <GlobalStyles />
       <div style={{ position: "absolute", top: 16, right: 16, zIndex: 5 }}>
         <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
